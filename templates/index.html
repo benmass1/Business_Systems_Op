@@ -1,16 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold">Business Systems Op</h2>
-    <button class="btn btn-primary px-4 shadow" data-bs-toggle="modal" data-bs-target="#modalBidhaa">
-        <i class="bi bi-plus-lg me-2"></i>+ Bidhaa Mpya
-    </button>
+    <h2 class="fw-bold">Business_Systems_Op</h2>
+    <button class="btn btn-primary shadow" data-bs-toggle="modal" data-bs-target="#modalBidhaa">+ Bidhaa Mpya</button>
 </div>
 
 <div class="row g-4 mb-4">
     <div class="col-md-4">
         <div class="card bg-dark text-white p-3 border-0 shadow">
-            <small class="text-secondary fw-bold">MAUZO YA LEO</small>
+            <small class="text-secondary fw-bold">THAMANI YA MAUZO (LEO)</small>
             <h3 class="fw-bold text-primary">Tsh {{ "{:,.0f}".format(total_sales) }}</h3>
         </div>
     </div>
@@ -27,12 +25,7 @@
     <div class="table-responsive">
         <table class="table table-dark table-hover">
             <thead>
-                <tr class="text-secondary">
-                    <th>JINA</th>
-                    <th>BEI (KUUZA)</th>
-                    <th>STOCK</th>
-                    <th>STATUS</th>
-                </tr>
+                <tr><th>JINA</th><th>BEI (KUUZA)</th><th>STOCK</th><th>ACTION</th></tr>
             </thead>
             <tbody>
                 {% for p in products %}
@@ -41,10 +34,10 @@
                     <td>Tsh {{ "{:,.0f}".format(p.selling_price) }}</td>
                     <td>{{ p.stock }}</td>
                     <td>
-                        {% if p.stock > 5 %}
-                        <span class="badge bg-success bg-opacity-10 text-success">In Stock</span>
+                        {% if p.stock > 0 %}
+                        <a href="/sell/{{ p.id }}" class="btn btn-sm btn-success px-3">Uza Moja</a>
                         {% else %}
-                        <span class="badge bg-danger bg-opacity-10 text-danger">Low Stock</span>
+                        <span class="badge bg-danger">Imeisha</span>
                         {% endif %}
                     </td>
                 </tr>
@@ -58,31 +51,18 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark text-white border-secondary">
             <div class="modal-header border-secondary">
-                <h5 class="modal-title fw-bold">Sajili Bidhaa Mpya</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">Sajili Bidhaa Mpya</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="/add_product" method="POST">
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label small text-secondary">Jina la Bidhaa</label>
-                        <input type="text" name="name" class="form-control bg-secondary bg-opacity-10 text-white border-secondary" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small text-secondary">Bei ya Kununua (Tsh)</label>
-                        <input type="number" name="buying_price" class="form-control bg-secondary bg-opacity-10 text-white border-secondary" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small text-secondary">Bei ya Kuuza (Tsh)</label>
-                        <input type="number" name="selling_price" class="form-control bg-secondary bg-opacity-10 text-white border-secondary" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small text-secondary">Idadi (Stock)</label>
-                        <input type="number" name="stock" class="form-control bg-secondary bg-opacity-10 text-white border-secondary" required>
-                    </div>
+                    <input type="text" name="name" class="form-control bg-dark text-white mb-2" placeholder="Jina la Bidhaa" required>
+                    <input type="number" name="buying_price" class="form-control bg-dark text-white mb-2" placeholder="Bei ya Kununua" required>
+                    <input type="number" name="selling_price" class="form-control bg-dark text-white mb-2" placeholder="Bei ya Kuuza" required>
+                    <input type="number" name="stock" class="form-control bg-dark text-white mb-2" placeholder="Idadi" required>
                 </div>
                 <div class="modal-footer border-secondary">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Funga</button>
-                    <button type="submit" class="btn btn-primary px-4">Hifadhi Bidhaa</button>
+                    <button type="submit" class="btn btn-primary w-100">Hifadhi</button>
                 </div>
             </form>
         </div>
