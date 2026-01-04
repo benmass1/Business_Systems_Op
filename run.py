@@ -6,14 +6,13 @@ import os
 app = Flask(__name__)
 app.secret_key = 'business_systems_op_2026_key'
 
-# Sehemu ya Database - Muhimu kwa Vercel kuzuia Internal Server Error
+# Sehemu ya Database - Muhimu kwa Vercel
 db_path = os.path.join('/tmp', 'business.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# Model ya Bidhaa
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -21,14 +20,12 @@ class Product(db.Model):
     selling_price = db.Column(db.Float, nullable=False)
     stock = db.Column(db.Integer, nullable=False)
 
-# Model ya Mauzo
 class Sale(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_name = db.Column(db.String(100))
     price = db.Column(db.Float)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Inatengeneza Database
 with app.app_context():
     db.create_all()
 
@@ -53,7 +50,6 @@ def index():
     low_stock_count = Product.query.filter(Product.stock <= 5).count()
     return render_template('index.html', products=products, total_sales=total_sales_val, low_stock_count=low_stock_count)
 
-# NJIA YA INVENTORY (Hii itaondoa "Not Found")
 @app.route('/inventory')
 def inventory():
     if not session.get('logged_in'): return redirect(url_for('login'))
