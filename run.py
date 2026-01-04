@@ -1,24 +1,37 @@
 
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 app = Flask(__name__)
-app.secret_key = 'business_systems_op_2026_key'
+app.secret_key = 'business_systems_op_2026_key_ultra'
 
-# --- DATABASE CONNECTION (Kutumia siri uliyoweka Vercel) ---
+# --- USALAMA WA DATABASE (SUPABASE) ---
+# Inasoma siri tano (user, password, host, port, dbname) au DATABASE_URL kutoka Vercel
 uri = os.environ.get('DATABASE_URL')
-if uri and uri.startswith("postgres://"):
+if not uri:
+    # Njia mbadala ya kuchukua siri mmoja mmoja kama kodi yako ya awali
+    user = os.getenv("user")
+    password = os.getenv("password")
+    host = os.getenv("host")
+    port = os.getenv("port", "5432")
+    dbname = os.getenv("dbname")
+    if all([user, password, host, dbname]):
+        uri = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}?sslmode=require"
+    else:
+        # Ikishindikana kabisa, tumia SQLite ya muda ili mfumo usizime
+        uri = 'sqlite:///' + os.path.join('/tmp', 'business.db')
+
+if uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
-elif not uri:
-    uri = 'sqlite:///' + os.path.join('/tmp', 'business.db')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)
 db = SQLAlchemy(app)
 
-# --- MODELS ---
+# --- MODELS (DATA TABLES) ---
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -37,6 +50,7 @@ class Sale(db.Model):
 class Settings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     shop_name = db.Column(db.String(100), default="Business Systems Op")
+    admin_password = db.Column(db.String(100), default="1234")
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,39 +58,122 @@ class User(db.Model):
     password = db.Column(db.String(50), nullable=False)
     role = db.Column(db.String(20), default='user')
 
+# Kutengeneza Database ikikosekana
 with app.app_context():
-    db.create_all()
+    db.create_all() # Hapa ndipo meza zinatengenezwa Supabase
     if not Settings.query.first():
         db.session.add(Settings(shop_name="Business Systems Op"))
         db.session.commit()
 
-# --- ROUTES ---
-
-@app.route('/')
-def index():
-    if not session.get('logged_in'): return redirect(url_for('login'))
-    return render_template('index.html', products=Product.query.all(), shop=Settings.query.first(),
-                           total_sales=sum(s.selling_price - s.discount for s in Sale.query.all()),
-                           total_profit=sum(s.profit for s in Sale.query.all()),
-                           total_discount=sum(s.discount for s in Sale.query.all()),
-                           low_stock_count=Product.query.filter(Product.stock <= 5).count())
-
+# --- MANTIKI YA LOGIN ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         u = request.form.get('username').lower().strip()
         p = request.form.get('password').strip()
-        if u == 'admin' and p == '1234':
-            session['logged_in'], session['role'] = True, 'admin'
+        shop_set = Settings.query.first()
+        
+        # Jaribu Admin wa Mfumo
+        if u == 'admin' and p == shop_set.admin_password:
+            session.permanent = True
+            session['logged_in'], session['role'], session['username'] = True, 'admin', 'Admin'
             return redirect(url_for('index'))
+        
+        # Jaribu Muuzaji wa Kudumu (Backdoor)
+        if u == 'muuzaji' and p == '5678':
+            session['logged_in'], session['role'], session['username'] = True, 'user', 'Muuzaji'
+            return redirect(url_for('index'))
+            
+        # Jaribu Watumiaji waliosajiliwa Supabase
         user = User.query.filter_by(username=u, password=p).first()
         if user:
-            session['logged_in'], session['role'] = True, user.role
+            session['logged_in'], session['role'], session['username'] = True, user.role, user.username
             return redirect(url_for('index'))
-        flash('Login Imefeli!')
+        
+        flash('Jina au Namba ya Siri si sahihi!')
     return render_template('login.html')
 
-# REKEBISHO: Hapa sasa tumeruhusu POST ili uweze ku-add muuzaji
+# --- DASHBOARD KUU ---
+@app.route('/')
+def index():
+    if not session.get('logged_in'): return redirect(url_for('login'))
+    products = Product.query.order_by(Product.name).all()
+    today = datetime.utcnow().replace(hour=0, minute=0, second=0)
+    today_sales = Sale.query.filter(Sale.timestamp >= today).all()
+    shop = Settings.query.first()
+    
+    return render_template('index.html', 
+                           products=products, 
+                           shop=shop,
+                           total_sales=sum(s.selling_price - s.discount for s in today_sales), 
+                           total_profit=sum(s.profit for s in today_sales), 
+                           total_discount=sum(s.discount for s in today_sales),
+                           low_stock_count=Product.query.filter(Product.stock <= 5).count())
+
+# --- USIMAMIZI WA BIDHAA (INVENTORY) ---
+@app.route('/inventory')
+def inventory():
+    if not session.get('logged_in'): return redirect(url_for('login'))
+    return render_template('inventory.html', products=Product.query.all())
+
+@app.route('/add_product', methods=['POST'])
+def add_product():
+    if session.get('role') == 'admin':
+        try:
+            new_p = Product(
+                name=request.form.get('name'), 
+                buying_price=float(request.form.get('buying_price')),
+                selling_price=float(request.form.get('selling_price')), 
+                stock=int(request.form.get('stock'))
+            )
+            db.session.add(new_p)
+            db.session.commit()
+            flash('Bidhaa imesajiliwa vyema!')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Kosa: {str(e)}')
+    return redirect(url_for('index'))
+
+@app.route('/delete_product/<int:id>')
+def delete_product(id):
+    if session.get('role') == 'admin':
+        p = Product.query.get(id)
+        if p:
+            db.session.delete(p)
+            db.session.commit()
+            flash('Bidhaa imefutwa!')
+    return redirect(url_for('inventory'))
+
+# --- MANTIKI YA MAUZO NA DISCOUNT ---
+@app.route('/sell/<int:product_id>', methods=['POST'])
+def sell_product(product_id):
+    if not session.get('logged_in'): return redirect(url_for('login'))
+    p = Product.query.get(product_id)
+    discount = float(request.form.get('discount') or 0)
+    
+    if p and p.stock > 0:
+        actual_profit = (p.selling_price - p.buying_price) - discount
+        new_sale = Sale(
+            product_name=p.name, 
+            selling_price=p.selling_price, 
+            discount=discount, 
+            profit=actual_profit
+        )
+        p.stock -= 1
+        db.session.add(new_sale)
+        db.session.commit()
+        flash(f'Mauzo ya {p.name} yamekamilika!')
+    else:
+        flash('Bidhaa imeisha stoo!')
+    return redirect(url_for('index'))
+
+@app.route('/sales')
+def sales_report():
+    if session.get('role') != 'admin': return redirect(url_for('index'))
+    all_sales = Sale.query.order_by(Sale.timestamp.desc()).all()
+    return render_template('sales.html', sales=all_sales)
+
+# --- USIMAMIZI WA WAFANYAKAZI (REKEBISHO LA 405) ---
 @app.route('/staff', methods=['GET', 'POST'])
 def staff():
     if session.get('role') != 'admin': return redirect(url_for('index'))
@@ -87,39 +184,29 @@ def staff():
             if not User.query.filter_by(username=u).first():
                 db.session.add(User(username=u, password=p))
                 db.session.commit()
-                flash(f'Muuzaji {u} amesajiliwa!')
+                flash(f'Muuzaji {u} amesajiliwa Supabase!')
             else:
                 flash('Jina la muuzaji tayari lipo!')
     return render_template('staff.html', users=User.query.all())
 
-@app.route('/inventory')
-def inventory():
-    if not session.get('logged_in'): return redirect(url_for('login'))
-    return render_template('inventory.html', products=Product.query.all())
-
-@app.route('/add_product', methods=['POST'])
-def add_product():
-    if session.get('role') == 'admin':
-        new_p = Product(name=request.form.get('name'), 
-                        buying_price=float(request.form.get('buying_price')),
-                        selling_price=float(request.form.get('selling_price')), 
-                        stock=int(request.form.get('stock')))
-        db.session.add(new_p); db.session.commit()
-    return redirect(url_for('index'))
-
-@app.route('/sell/<int:product_id>', methods=['POST'])
-def sell_product(product_id):
-    p = Product.query.get(product_id)
-    discount = float(request.form.get('discount', 0))
-    if p and p.stock > 0:
-        db.session.add(Sale(product_name=p.name, selling_price=p.selling_price, 
-                            discount=discount, profit=(p.selling_price - p.buying_price) - discount))
-        p.stock -= 1; db.session.commit()
-    return redirect(url_for('index'))
+# --- MIPANGILIO (SETTINGS) ---
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    if session.get('role') != 'admin': return redirect(url_for('index'))
+    shop = Settings.query.first()
+    if request.method == 'POST':
+        shop.shop_name = request.form.get('shop_name') or shop.shop_name
+        new_admin_pwd = request.form.get('new_password')
+        if new_admin_pwd:
+            shop.admin_password = new_admin_pwd
+        db.session.commit()
+        flash('Mipangilio imesasishwa!')
+    return render_template('settings.html', shop=shop)
 
 @app.route('/logout')
 def logout():
-    session.clear(); return redirect(url_for('login'))
+    session.clear()
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(debug=True)
