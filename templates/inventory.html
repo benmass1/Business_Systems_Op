@@ -1,29 +1,153 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2 class="fw-bold text-white mb-4">Ripoti ya Stoo</h2>
-<div class="bg-dark p-3 shadow" style="border-radius: 15px;">
-    <div class="table-responsive">
-        <table class="table table-dark table-hover align-middle">
-            <thead class="text-secondary small">
-                <tr><th>BIDHAA</th>{% if session.get('role') == 'admin' %}<th>KUNUNUA</th>{% endif %}<th>KUUZA</th><th>STOCK</th><th>ACTION</th></tr>
-            </thead>
-            <tbody>
-                {% for p in products %}
-                <tr>
-                    <td class="fw-bold">{{ p.name }}</td>
-                    {% if session.get('role') == 'admin' %}<td>{{ "{:,.0f}".format(p.buying_price) }}</td>{% endif %}
-                    <td>{{ "{:,.0f}".format(p.selling_price) }}</td>
-                    <td><span class="badge {% if p.stock <= 5 %}bg-danger{% else %}bg-primary{% endif %}">{{ p.stock }}</span></td>
-                    <td>
+<div class="container-fluid p-0">
+    <div class="d-flex justify-content-between align-items-center mb-4 text-white">
+        <div>
+            <h2 class="fw-bold mb-1">Ripoti ya Stoo (Inventory)</h2>
+            <p class="text-secondary small mb-0">Hali ya bidhaa na thamani ya mali iliyopo ghalani</p>
+        </div>
+        {% if session.get('role') == 'admin' %}
+        <div class="text-end">
+            <span class="badge bg-primary px-3 py-2 rounded-pill">Admin View</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card bg-dark border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="card-header bg-dark border-bottom border-secondary p-3">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h6 class="mb-0 text-white fw-bold"><i class="bi bi-box-seam me-2 text-primary"></i>Orodha ya Bidhaa</h6>
+                </div>
+                <div class="col text-end">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+                        <i class="bi bi-printer me-1"></i> Print
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+                <thead class="text-secondary small text-uppercase">
+                    <tr>
+                        <th class="px-4 py-3 border-0">Bidhaa</th>
                         {% if session.get('role') == 'admin' %}
-                        <a href="/delete_product/{{ p.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Una uhakika unataka kufuta bidhaa hii?')"><i class="bi bi-trash"></i></a>
+                        <th class="border-0 text-info">Bei Kununua</th>
                         {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        <th class="border-0 text-primary">Bei Kuuza</th>
+                        <th class="border-0">Stoo Iliyopo</th>
+                        {% if session.get('role') == 'admin' %}
+                        <th class="border-0 text-success">Thamani ya Stock</th>
+                        <th class="border-0 text-center">Kitendo</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody class="border-top border-secondary">
+                    {% for p in products %}
+                    <tr>
+                        <td class="px-4 py-3 border-0">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded me-3 text-primary">
+                                    <i class="bi bi-tag-fill"></i>
+                                </div>
+                                <span class="fw-bold text-white fs-6">{{ p.name }}</span>
+                            </div>
+                        </td>
+                        
+                        {% if session.get('role') == 'admin' %}
+                        <td class="border-0 text-secondary">
+                            Tsh {{ "{:,.0f}".format(p.buying_price) }}
+                        </td>
+                        {% endif %}
+                        
+                        <td class="border-0 fw-bold">
+                            Tsh {{ "{:,.0f}".format(p.selling_price) }}
+                        </td>
+                        
+                        <td class="border-0">
+                            {% if p.stock <= 5 %}
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 rounded-pill">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ p.stock }} Low
+                            </span>
+                            {% else %}
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 rounded-pill">
+                                {{ p.stock }} In Stock
+                            </span>
+                            {% endif %}
+                        </td>
+                        
+                        {% if session.get('role') == 'admin' %}
+                        <td class="border-0 text-success fw-bold">
+                            Tsh {{ "{:,.0f}".format(p.buying_price * p.stock) }}
+                        </td>
+                        <td class="border-0 text-center">
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <a href="/delete_product/{{ p.id }}" 
+                                   class="btn btn-sm btn-outline-danger" 
+                                   onclick="return confirm('Je, una uhakika unataka kufuta bidhaa ya {{ p.name }}?')"
+                                   title="Delete">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            </div>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-secondary">
+                            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                            Bado hakuna bidhaa yoyote ghalani.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if session.get('role') == 'admin' %}
+        <div class="card-footer bg-dark border-top border-secondary p-3">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <small class="text-secondary d-block">IDADI YA BIDHAA</small>
+                    <span class="fw-bold text-white">{{ products|length }}</span>
+                </div>
+                <div class="col-md-4">
+                    <small class="text-secondary d-block">MALI YOTE GHALANI</small>
+                    <span class="fw-bold text-success">
+                        Tsh {{ "{:,.0f}".format(products|sum(attribute='buying_price') * products|sum(attribute='stock') if products else 0) }}
+                    </span>
+                </div>
+                <div class="col-md-4">
+                    <small class="text-secondary d-block">BIDHAA ZILIZOISHA</small>
+                    <span class="fw-bold text-danger">
+                        {% set count = [] %}
+                        {% for p in products %}{% if p.stock <= 5 %}{% set _ = count.append(1) %}{% endif %}{% endfor %}
+                        {{ count|length }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
+
+<style>
+    /* Custom Scrollbar for the table */
+    .table-responsive::-webkit-scrollbar { height: 8px; }
+    .table-responsive::-webkit-scrollbar-track { background: #1e293b; }
+    .table-responsive::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+    
+    @media print {
+        .sidebar, .btn, .role-badge { display: none !important; }
+        .main-content { margin-left: 0 !important; width: 100% !important; }
+        .card { border: 1px solid #ccc !important; }
+        body { background-color: white !important; color: black !important; }
+        .table { color: black !important; }
+    }
+</style>
 {% endblock %}
 
