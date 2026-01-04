@@ -1,71 +1,49 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Dashboard</h2>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">+ Sajili Bidhaa</button>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">Business_Systems_Op Dashboard</h2>
+    <button class="btn btn-primary">+ Bidhaa Mpya</button>
+</div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="card bg-dark text-white border-0 shadow-sm p-3">
-                <small class="text-secondary">MAUZO YA LEO</small>
-                <h2 class="fw-bold">Tsh {{ "{:,.0f}".format(total_sales) }}</h2>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-dark text-white border-0 shadow-sm p-3 border-start border-danger border-4">
-                <small class="text-secondary">LOW STOCK</small>
-                <h2 class="fw-bold">{{ low_stock_count }}</h2>
-            </div>
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card bg-dark text-white p-3 border-0 shadow">
+            <small class="text-secondary">MAUZO YA LEO</small>
+            <h3 class="fw-bold">Tsh {{ "{:,.0f}".format(total_sales) }}</h3>
         </div>
     </div>
+    <div class="col-md-4">
+        <div class="card bg-dark text-white p-3 border-0 shadow border-start border-danger border-4">
+            <small class="text-secondary">LOW STOCK ALERT</small>
+            <h3 class="text-danger fw-bold">{{ low_stock_count }}</h3>
+        </div>
+    </div>
+</div>
 
-    <div class="table-responsive bg-dark p-3" style="border-radius: 15px;">
-        <table class="table table-dark table-hover">
+<div class="bg-dark p-4" style="border-radius: 15px;">
+    <h5 class="mb-4 text-secondary">Muhtasari wa Ghalani</h5>
+    <div class="table-responsive">
+        <table class="table table-dark">
             <thead>
-                <tr>
-                    <th>Bidhaa</th>
-                    <th>Bei ya Kuuza</th>
-                    <th>Stock</th>
-                    <th>Action</th>
-                </tr>
+                <tr><th>BIDHAA</th><th>BEI (KUUZA)</th><th>STOCK</th><th>STATUS</th></tr>
             </thead>
             <tbody>
                 {% for p in products %}
                 <tr>
                     <td>{{ p.name }}</td>
                     <td>Tsh {{ "{:,.0f}".format(p.selling_price) }}</td>
+                    <td>{{ p.stock }}</td>
                     <td>
-                        {% if p.stock <= 5 %}
-                        <span class="badge bg-danger">Chache: {{ p.stock }}</span>
+                        {% if p.stock > 5 %}
+                        <span class="badge bg-success bg-opacity-25 text-success px-3">In Stock</span>
                         {% else %}
-                        <span class="badge bg-success">Ipo: {{ p.stock }}</span>
+                        <span class="badge bg-danger bg-opacity-25 text-danger px-3">Low Stock</span>
                         {% endif %}
                     </td>
-                    <td><button class="btn btn-sm btn-outline-primary">Uza</button></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    </div>
-</div>
-
-<div class="modal fade" id="addModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content bg-dark text-white">
-            <form action="/add_product" method="POST">
-                <div class="modal-body">
-                    <input type="text" name="name" class="form-control mb-2" placeholder="Jina la Bidhaa" required>
-                    <input type="number" name="buying_price" class="form-control mb-2" placeholder="Bei ya Kununua" required>
-                    <input type="number" name="selling_price" class="form-control mb-2" placeholder="Bei ya Kuuza" required>
-                    <input type="number" name="stock" class="form-control mb-2" placeholder="Idadi" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary w-100">Hifadhi</button>
-                </div>
-            </form>
-        </div>
     </div>
 </div>
 {% endblock %}
