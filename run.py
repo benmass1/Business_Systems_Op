@@ -6,13 +6,12 @@ import os
 app = Flask(__name__)
 app.secret_key = 'business_systems_op_2026_key'
 
-# Mpangilio wa Database (Vercel Storage Safe)
 db_path = os.path.join('/tmp', 'business.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# --- MODELS ---
+# Models
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -33,18 +32,23 @@ class Sale(db.Model):
     profit = db.Column(db.Float)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Inatengeneza Database ikikosekana
+# Mpangilio wa Duka (Hifadhi Jina la Duka)
+class Settings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    shop_name = db.Column(db.String(100), default="Business Systems Op")
+
 with app.app_context():
     db.create_all()
-
-# --- ROUTES ---
+    if not Settings.query.first():
+        db.session.add(Settings(shop_name="Business Systems Op"))
+        db.session.commit()
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         u_name = request.form.get('username').strip().lower()
         pwd = request.form.get('password').strip()
-        if u_name == 'admin' and pwd == '1234':
+        if u_name == 'admin' and pwd == session.get('admin_pwd', '1234'):
             session['logged_in'], session['role'], session['username'] = True, 'admin', 'Admin'
             return redirect(url_for('index'))
         user = User.query.filter_by(username=u_name, password=pwd).first()
@@ -57,48 +61,49 @@ def login():
 @app.route('/')
 def index():
     if not session.get('logged_in'): return redirect(url_for('login'))
-    try:
-        products = Product.query.all()
-        today = datetime.utcnow().replace(hour=0, minute=0, second=0)
-        today_sales = Sale.query.filter(Sale.timestamp >= today).all()
-        return render_template('index.html', products=products, 
-                               total_sales=sum(s.selling_price for s in today_sales), 
-                               total_profit=sum(s.profit for s in today_sales), 
-                               low_stock_count=Product.query.filter(Product.stock <= 5).count())
-    except:
-        return "Shida ya Database! Tafadhali Refresh Page."
+    products = Product.query.all()
+    today = datetime.utcnow().replace(hour=0, minute=0, second=0)
+    today_sales = Sale.query.filter(Sale.timestamp >= today).all()
+    shop = Settings.query.first()
+    return render_template('index.html', products=products, shop=shop,
+                           total_sales=sum(s.selling_price for s in today_sales), 
+                           total_profit=sum(s.profit for s in today_sales), 
+                           low_stock_count=Product.query.filter(Product.stock <= 5).count())
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    if session.get('role') != 'admin': return redirect(url_for('index'))
+    shop = Settings.query.first()
+    if request.method == 'POST':
+        new_name = request.form.get('shop_name')
+        new_pwd = request.form.get('new_password')
+        if new_name:
+            shop.shop_name = new_name
+        if new_pwd:
+            session['admin_pwd'] = new_pwd # Kwa sasa tunahifadhi kwenye session
+        db.session.commit()
+        flash('Mipangilio imehifadhiwa!')
+        return redirect(url_for('settings'))
+    return render_template('settings.html', shop=shop)
 
 @app.route('/inventory')
 def inventory():
     if not session.get('logged_in'): return redirect(url_for('login'))
     return render_template('inventory.html', products=Product.query.all())
 
-@app.route('/sales')
-def sales_report():
-    if session.get('role') != 'admin': return redirect(url_for('index'))
-    sales = Sale.query.order_by(Sale.timestamp.desc()).all()
-    return render_template('sales.html', sales=sales)
-
 @app.route('/staff', methods=['GET', 'POST'])
 def staff():
     if session.get('role') != 'admin': return redirect(url_for('index'))
     if request.method == 'POST':
-        u = request.form.get('username').lower()
-        p = request.form.get('password')
-        if u and p:
-            db.session.add(User(username=u, password=p)); db.session.commit()
-            flash('Muuzaji amesajiliwa!')
+        db.session.add(User(username=request.form.get('username').lower(), password=request.form.get('password')))
+        db.session.commit()
+        flash('Muuzaji amesajiliwa!')
     return render_template('staff.html', users=User.query.all())
 
-# HII NDIO ILIKUWA INALETA ERROR KWENYE PICHA YAKO
-@app.route('/settings', methods=['GET', 'POST'])
-def settings():
-    if not session.get('logged_in') or session.get('role') != 'admin':
-        return redirect(url_for('index'))
-    if request.method == 'POST':
-        flash('Mipangilio imehifadhiwa!')
-        return redirect(url_for('settings'))
-    return render_template('settings.html')
+@app.route('/sales')
+def sales_report():
+    if session.get('role') != 'admin': return redirect(url_for('index'))
+    return render_template('sales.html', sales=Sale.query.order_by(Sale.timestamp.desc()).all())
 
 @app.route('/add_product', methods=['POST'])
 def add_product():
@@ -117,7 +122,6 @@ def delete_product(id):
 
 @app.route('/sell/<int:product_id>')
 def sell_product(product_id):
-    if not session.get('logged_in'): return redirect(url_for('login'))
     p = Product.query.get(product_id)
     if p and p.stock > 0:
         db.session.add(Sale(product_name=p.name, selling_price=p.selling_price, profit=p.selling_price - p.buying_price))
