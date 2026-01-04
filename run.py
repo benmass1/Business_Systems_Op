@@ -6,13 +6,13 @@ import os
 app = Flask(__name__)
 app.secret_key = 'business_systems_op_2026_key'
 
-# Database Setup (Salama kwa Vercel)
+# Mpangilio wa Database (Vercel Storage Safe)
 db_path = os.path.join('/tmp', 'business.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Models
+# --- MODELS ---
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -33,8 +33,11 @@ class Sale(db.Model):
     profit = db.Column(db.Float)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+# Inatengeneza Database ikikosekana
 with app.app_context():
     db.create_all()
+
+# --- ROUTES ---
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -54,12 +57,16 @@ def login():
 @app.route('/')
 def index():
     if not session.get('logged_in'): return redirect(url_for('login'))
-    products = Product.query.all()
-    today_sales = Sale.query.filter(Sale.timestamp >= datetime.utcnow().replace(hour=0, minute=0, second=0)).all()
-    return render_template('index.html', products=products, 
-                           total_sales=sum(s.selling_price for s in today_sales), 
-                           total_profit=sum(s.profit for s in today_sales), 
-                           low_stock_count=Product.query.filter(Product.stock <= 5).count())
+    try:
+        products = Product.query.all()
+        today = datetime.utcnow().replace(hour=0, minute=0, second=0)
+        today_sales = Sale.query.filter(Sale.timestamp >= today).all()
+        return render_template('index.html', products=products, 
+                               total_sales=sum(s.selling_price for s in today_sales), 
+                               total_profit=sum(s.profit for s in today_sales), 
+                               low_stock_count=Product.query.filter(Product.stock <= 5).count())
+    except:
+        return "Shida ya Database! Tafadhali Refresh Page."
 
 @app.route('/inventory')
 def inventory():
@@ -69,21 +76,25 @@ def inventory():
 @app.route('/sales')
 def sales_report():
     if session.get('role') != 'admin': return redirect(url_for('index'))
-    return render_template('sales.html', sales=Sale.query.order_by(Sale.timestamp.desc()).all())
+    sales = Sale.query.order_by(Sale.timestamp.desc()).all()
+    return render_template('sales.html', sales=sales)
 
 @app.route('/staff', methods=['GET', 'POST'])
 def staff():
     if session.get('role') != 'admin': return redirect(url_for('index'))
     if request.method == 'POST':
-        new_user = User(username=request.form.get('username').lower(), password=request.form.get('password'))
-        db.session.add(new_user); db.session.commit()
-        flash('Muuzaji amesajiliwa!')
+        u = request.form.get('username').lower()
+        p = request.form.get('password')
+        if u and p:
+            db.session.add(User(username=u, password=p)); db.session.commit()
+            flash('Muuzaji amesajiliwa!')
     return render_template('staff.html', users=User.query.all())
 
-# UKURASA WA MIPANGILIO (Zamani ulikuwa Not Found)
+# HII NDIO ILIKUWA INALETA ERROR KWENYE PICHA YAKO
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
-    if session.get('role') != 'admin': return redirect(url_for('index'))
+    if not session.get('logged_in') or session.get('role') != 'admin':
+        return redirect(url_for('index'))
     if request.method == 'POST':
         flash('Mipangilio imehifadhiwa!')
         return redirect(url_for('settings'))
@@ -106,6 +117,7 @@ def delete_product(id):
 
 @app.route('/sell/<int:product_id>')
 def sell_product(product_id):
+    if not session.get('logged_in'): return redirect(url_for('login'))
     p = Product.query.get(product_id)
     if p and p.stock > 0:
         db.session.add(Sale(product_name=p.name, selling_price=p.selling_price, profit=p.selling_price - p.buying_price))
