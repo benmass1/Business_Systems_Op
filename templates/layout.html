@@ -3,37 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Systems Op</title>
+    <title>Business Systems Op | Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
     <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: sans-serif; }
-        .sidebar { background: #1e293b; min-height: 100vh; width: 260px; position: fixed; border-right: 1px solid #334155; }
-        .nav-link { color: #94a3b8; padding: 12px 20px; border-radius: 10px; display: flex; align-items: center; text-decoration: none; margin-bottom: 5px; transition: 0.3s; }
-        .nav-link:hover, .active { background: #3b82f6; color: white; }
-        .main-content { margin-left: 260px; padding: 30px; }
-        @media (max-width: 992px) { .sidebar { width: 100%; min-height: auto; position: relative; } .main-content { margin-left: 0; } }
+        :root {
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --accent-glow: #3b82f6;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: #e2e8f0;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Sidebar Glassmorphism */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            height: 100vh;
+            position: fixed;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            font-weight: 800;
+            font-size: 1.4rem;
+            background: linear-gradient(to right, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            letter-spacing: -1px;
+        }
+
+        .nav-link {
+            color: #94a3b8;
+            padding: 14px 18px;
+            border-radius: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-link i {
+            font-size: 1.25rem;
+            margin-right: 15px;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            transform: translateX(8px);
+        }
+
+        .nav-link.active {
+            background: var(--accent-glow);
+            color: white;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Main Content wrapper */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            transition: all 0.3s;
+        }
+
+        /* Glass Cards for dashboard */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .role-indicator {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-glow);
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .logout-section {
+            position: absolute;
+            bottom: 30px;
+            width: calc(var(--sidebar-width) - 40px);
+        }
+
+        /* Mobile View */
+        @media (max-width: 992px) {
+            .sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+            .main-content { margin-left: 0; padding: 20px; }
+            .logout-section { position: relative; bottom: 0; width: 100%; margin-top: 20px; }
+        }
     </style>
 </head>
 <body>
-    <div class="sidebar p-4">
-        <h5 class="text-primary fw-bold mb-5 px-2">BUSINESS OP</h5>
+
+    <div class="sidebar">
+        <div class="brand-logo text-center">BUSINESS OP</div>
+        
+        <div class="px-3 mb-4">
+            <div class="role-indicator text-center">
+                <i class="bi bi-shield-check me-1"></i> {{ session.get('role') }} Mode
+            </div>
+        </div>
+
         <nav>
-            <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}"><i class="bi bi-grid-1x2-fill me-3"></i> Dashboard</a>
-            <a href="/inventory" class="nav-link {% if request.path == '/inventory' %}active{% endif %}"><i class="bi bi-box-seam me-3"></i> Stoo (Inventory)</a>
+            <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                <i class="bi bi-house-door-fill"></i> Dashboard
+            </a>
             
+            <a href="/inventory" class="nav-link {% if request.path == '/inventory' %}active{% endif %}">
+                <i class="bi bi-box-fill"></i> Inventory
+            </a>
+
             {% if session.get('role') == 'admin' %}
-            <a href="/sales" class="nav-link {% if request.path == '/sales' %}active{% endif %}"><i class="bi bi-graph-up-arrow me-3"></i> Ripoti ya Mauzo</a>
-            <a href="/staff" class="nav-link"><i class="bi bi-people me-3"></i> Wafanyakazi</a>
-            <a href="/settings" class="nav-link"><i class="bi bi-gear me-3"></i> Mipangilio</a>
-            {% endif %}
+            <a href="/sales" class="nav-link {% if request.path == '/sales' %}active{% endif %}">
+                <i class="bi bi-pie-chart-fill"></i> Mauzo & Faida
+            </a>
             
-            <a href="/logout" class="nav-link text-danger mt-4 border border-danger"><i class="bi bi-door-open me-3"></i> Logout</a>
+            <a href="/staff" class="nav-link {% if request.path == '/staff' %}active{% endif %}">
+                <i class="bi bi-people-fill"></i> Wafanyakazi
+            </a>
+            
+            <a href="/settings" class="nav-link {% if request.path == '/settings' %}active{% endif %}">
+                <i class="bi bi-gear-fill"></i> Mipangilio
+            </a>
+            {% endif %}
+
+            <div class="logout-section">
+                <a href="/logout" class="nav-link text-danger border border-danger border-opacity-25">
+                    <i class="bi bi-power"></i> Logout
+                </a>
+            </div>
         </nav>
     </div>
+
     <div class="main-content">
         {% block content %}{% endblock %}
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
