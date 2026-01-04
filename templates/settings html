@@ -2,31 +2,26 @@
 {% block content %}
 <div class="mb-4 text-white">
     <h2 class="fw-bold">Mipangilio ya Mfumo</h2>
-    <p class="text-secondary">Rekebisha taarifa za duka na usalama</p>
+    <p class="text-secondary">Usimamizi wa duka na usalama</p>
 </div>
-
-{% with messages = get_flashed_messages() %}
-  {% if messages %}<div class="alert alert-success shadow-sm">{{ messages[0] }}</div>{% endif %}
-{% endwith %}
 
 <div class="row g-4">
     <div class="col-md-6">
         <div class="card bg-dark text-white p-4 border-0 shadow-sm" style="border-radius: 20px;">
-            <h5 class="mb-4 text-primary"><i class="bi bi-shield-lock me-2"></i>Badili Password ya Admin</h5>
+            <h5 class="mb-4 text-primary"><i class="bi bi-shield-lock me-2"></i>Usalama wa Admin</h5>
             <form action="/settings" method="POST">
+                <div class="mb-3">
+                    <label class="small text-secondary">Username ya Admin</label>
+                    <input type="text" class="form-control bg-dark text-white border-secondary" value="admin" readonly>
+                </div>
                 <div class="mb-3">
                     <label class="small text-secondary">Password ya Sasa</label>
                     <input type="password" class="form-control bg-dark text-white border-secondary" value="1234" readonly>
-                </div>
-                <div class="mb-3">
-                    <label class="small text-secondary">Password Mpya</label>
-                    <input type="password" name="new_password" class="form-control bg-dark text-white border-primary" placeholder="Weka password mpya">
                 </div>
                 <button type="submit" class="btn btn-primary w-100 fw-bold">Hifadhi Mabadiliko</button>
             </form>
         </div>
     </div>
-
     <div class="col-md-6">
         <div class="card bg-dark text-white p-4 border-0 shadow-sm" style="border-radius: 20px;">
             <h5 class="mb-4 text-warning"><i class="bi bi-shop me-2"></i>Taarifa za Biashara</h5>
@@ -34,13 +29,9 @@
                 <label class="small text-secondary">Jina la Biashara</label>
                 <input type="text" class="form-control bg-dark text-white border-secondary" value="Business Systems Op" readonly>
             </div>
-            <div class="mb-3">
-                <label class="small text-secondary">Mkoa/Eneo</label>
-                <input type="text" class="form-control bg-dark text-white border-secondary" value="Tanzania" readonly>
-            </div>
-            <p class="text-muted small italic">Ili kubadili jina la biashara, wasiliana na fundi wako wa kodi.</p>
+            <p class="text-muted small">Marekebisho ya jina la duka yataonekana kwenye kila ripoti.</p>
         </div>
     </div>
 </div>
 {% endblock %}
-￼Enter
+
