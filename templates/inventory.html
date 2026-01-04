@@ -1,44 +1,24 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="mb-4">
-    <h2 class="fw-bold text-white mb-0">Ripoti ya Stoo (Inventory)</h2>
-    <p class="text-secondary small">Orodha kamili ya bidhaa zilizopo ghalani</p>
-</div>
-
-<div class="card bg-dark border-0 shadow-sm p-3" style="border-radius: 20px;">
+<h2 class="fw-bold text-white mb-4">Ripoti ya Stoo</h2>
+<div class="bg-dark p-3 shadow" style="border-radius: 15px;">
     <div class="table-responsive">
         <table class="table table-dark table-hover align-middle">
-            <thead class="text-secondary small text-uppercase">
-                <tr>
-                    <th class="px-3 border-0">Jina la Bidhaa</th>
-                    {% if session.get('role') == 'admin' %}
-                    <th class="border-0">Bei ya Kununua</th>
-                    {% endif %}
-                    <th class="border-0">Bei ya Kuuza</th>
-                    <th class="border-0">Stock Iliyopo</th>
-                    {% if session.get('role') == 'admin' %}
-                    <th class="border-0">Thamani ya Stock</th>
-                    {% endif %}
-                </tr>
+            <thead class="text-secondary small">
+                <tr><th>BIDHAA</th>{% if session.get('role') == 'admin' %}<th>KUNUNUA</th>{% endif %}<th>KUUZA</th><th>STOCK</th><th>ACTION</th></tr>
             </thead>
             <tbody>
                 {% for p in products %}
                 <tr>
-                    <td class="fw-bold px-3 border-0 text-primary">{{ p.name }}</td>
-                    {% if session.get('role') == 'admin' %}
-                    <td class="border-0">Tsh {{ "{:,.0f}".format(p.buying_price) }}</td>
-                    {% endif %}
-                    <td class="border-0">Tsh {{ "{:,.0f}".format(p.selling_price) }}</td>
-                    <td class="border-0">
-                        <span class="badge {% if p.stock <= 5 %}bg-danger{% else %}bg-primary{% endif %} px-3 rounded-pill">
-                            {{ p.stock }} Units
-                        </span>
+                    <td class="fw-bold">{{ p.name }}</td>
+                    {% if session.get('role') == 'admin' %}<td>{{ "{:,.0f}".format(p.buying_price) }}</td>{% endif %}
+                    <td>{{ "{:,.0f}".format(p.selling_price) }}</td>
+                    <td><span class="badge {% if p.stock <= 5 %}bg-danger{% else %}bg-primary{% endif %}">{{ p.stock }}</span></td>
+                    <td>
+                        {% if session.get('role') == 'admin' %}
+                        <a href="/delete_product/{{ p.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Una uhakika unataka kufuta bidhaa hii?')"><i class="bi bi-trash"></i></a>
+                        {% endif %}
                     </td>
-                    {% if session.get('role') == 'admin' %}
-                    <td class="border-0 text-success">
-                        Tsh {{ "{:,.0f}".format(p.buying_price * p.stock) }}
-                    </td>
-                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
