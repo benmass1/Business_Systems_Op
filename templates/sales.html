@@ -1,4 +1,26 @@
-here{% extends "layout.html" %}
+{% extends "layout.html" %}
 {% block content %}
-<h2 class="fw-bold mb-4 text-warning">Historia ya Mauzo ya Leo</h2>
-<div class="bg-dark p-4 shadow" style
+<h2 class="fw-bold mb-4 text-white">Historia ya Mauzo</h2>
+<div class="bg-dark p-3 shadow" style="border-radius: 15px;">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover">
+            <thead>
+                <tr class="text-secondary"><th>MUDA</th><th>BIDHAA</th><th>BEI</th><th>FAIDA</th></tr>
+            </thead>
+            <tbody>
+                {% for s in sales %}
+                <tr>
+                    <td>{{ s.timestamp.strftime('%H:%M') }}</td>
+                    <td class="fw-bold">{{ s.product_name }}</td>
+                    <td class="text-primary">{{ "{:,.0f}".format(s.selling_price) }}</td>
+                    <td class="text-success">+{{ "{:,.0f}".format(s.profit) }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="text-center text-secondary py-4">Bado hakuna mauzo.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
