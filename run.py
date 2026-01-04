@@ -6,9 +6,7 @@ import os
 app = Flask(__name__)
 app.secret_key = 'business_systems_op_2026_key'
 
-# Sehemu ya Database - Imetengenezwa kuzuia Internal Server Error
-basedir = os.path.abspath(os.path.dirname(__file__))
-# Tunatumia /tmp/ kwa sababu Vercel inaruhusu kuandika huko pekee
+# Sehemu ya Database - Muhimu kwa Vercel kuzuia Internal Server Error
 db_path = os.path.join('/tmp', 'business.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -30,7 +28,7 @@ class Sale(db.Model):
     price = db.Column(db.Float)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Inatengeneza database mara moja mfumo unapoanza
+# Inatengeneza Database
 with app.app_context():
     db.create_all()
 
@@ -43,33 +41,36 @@ def login():
             session['logged_in'] = True
             return redirect(url_for('index'))
         else:
-            flash('Login Failed! Tumia admin na 1234')
+            flash('Login Failed!')
     return render_template('login.html')
 
 @app.route('/')
 def index():
     if not session.get('logged_in'): return redirect(url_for('login'))
     products = Product.query.all()
-    # Mauzo ya leo tu
     today_sales = Sale.query.filter(Sale.timestamp >= datetime.utcnow().replace(hour=0, minute=0, second=0)).all()
     total_sales_val = sum(s.price for s in today_sales)
     low_stock_count = Product.query.filter(Product.stock <= 5).count()
     return render_template('index.html', products=products, total_sales=total_sales_val, low_stock_count=low_stock_count)
 
+# NJIA YA INVENTORY (Hii itaondoa "Not Found")
+@app.route('/inventory')
+def inventory():
+    if not session.get('logged_in'): return redirect(url_for('login'))
+    products = Product.query.all()
+    return render_template('inventory.html', products=products)
+
 @app.route('/add_product', methods=['POST'])
 def add_product():
     if not session.get('logged_in'): return redirect(url_for('login'))
-    try:
-        new_p = Product(
-            name=request.form.get('name'),
-            buying_price=float(request.form.get('buying_price')),
-            selling_price=float(request.form.get('selling_price')),
-            stock=int(request.form.get('stock'))
-        )
-        db.session.add(new_p)
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
+    new_p = Product(
+        name=request.form.get('name'),
+        buying_price=float(request.form.get('buying_price')),
+        selling_price=float(request.form.get('selling_price')),
+        stock=int(request.form.get('stock'))
+    )
+    db.session.add(new_p)
+    db.session.commit()
     return redirect(url_for('index'))
 
 @app.route('/sell/<int:product_id>')
