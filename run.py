@@ -6,13 +6,12 @@ import os
 app = Flask(__name__)
 app.secret_key = 'business_systems_op_2026_key'
 
-# Sehemu ya Database - Salama kwa Vercel
 db_path = os.path.join('/tmp', 'business.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Models
+# Model ya Bidhaa
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -20,6 +19,14 @@ class Product(db.Model):
     selling_price = db.Column(db.Float, nullable=False)
     stock = db.Column(db.Integer, nullable=False)
 
+# Model ya Wafanyakazi (Hii ndio uliyoiomba)
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(50), nullable=False)
+    role = db.Column(db.String(20), default='user')
+
+# Model ya Mauzo
 class Sale(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_name = db.Column(db.String(100))
@@ -33,15 +40,21 @@ with app.app_context():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = request.form.get('username').strip().lower()
+        u_name = request.form.get('username').strip().lower()
         pwd = request.form.get('password').strip()
-        if user == 'admin' and pwd == '1234':
-            session['logged_in'], session['role'] = True, 'admin'
+        
+        # Login ya Admin wa kudumu
+        if u_name == 'admin' and pwd == '1234':
+            session['logged_in'], session['role'], session['username'] = True, 'admin', 'Admin'
             return redirect(url_for('index'))
-        elif user == 'muuzaji' and pwd == '5678':
-            session['logged_in'], session['role'] = True, 'user'
+        
+        # Login ya Wafanyakazi waliosajiliwa
+        user = User.query.filter_by(username=u_name, password=pwd).first()
+        if user:
+            session['logged_in'], session['role'], session['username'] = True, user.role, user.username
             return redirect(url_for('index'))
-        flash('Login Failed!')
+        
+        flash('Jina au Namba ya siri siyo sahihi!')
     return render_template('login.html')
 
 @app.route('/')
@@ -54,26 +67,24 @@ def index():
                            total_profit=sum(s.profit for s in today_sales), 
                            low_stock_count=Product.query.filter(Product.stock <= 5).count())
 
+@app.route('/staff', methods=['GET', 'POST'])
+def staff():
+    if session.get('role') != 'admin': return redirect(url_for('index'))
+    if request.method == 'POST':
+        new_user = User(username=request.form.get('username').lower(), password=request.form.get('password'))
+        db.session.add(new_user); db.session.commit()
+        flash('Muuzaji amesajiliwa kikamilifu!')
+    return render_template('staff.html', users=User.query.all())
+
 @app.route('/inventory')
 def inventory():
     if not session.get('logged_in'): return redirect(url_for('login'))
     return render_template('inventory.html', products=Product.query.all())
 
-# KURASA MPYA ZILIZOKUWA ZINALETA "NOT FOUND"
 @app.route('/sales')
 def sales_report():
     if session.get('role') != 'admin': return redirect(url_for('index'))
     return render_template('sales.html', sales=Sale.query.order_by(Sale.timestamp.desc()).all())
-
-@app.route('/staff')
-def staff():
-    if session.get('role') != 'admin': return redirect(url_for('index'))
-    return "<h3>Ukurasa wa Wafanyakazi unakuja hivi karibuni...</h3><a href='/'>Rudi</a>"
-
-@app.route('/settings')
-def settings():
-    if session.get('role') != 'admin': return redirect(url_for('index'))
-    return "<h3>Mipangilio ya Mfumo inakuja hivi karibuni...</h3><a href='/'>Rudi</a>"
 
 @app.route('/add_product', methods=['POST'])
 def add_product():
