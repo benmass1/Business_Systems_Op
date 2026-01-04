@@ -1,39 +1,39 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-white">Dashboard</h2>
-    <button class="btn btn-primary shadow" data-bs-toggle="modal" data-bs-target="#modalBidhaa">+ Sajili Bidhaa</button>
+<div class="d-flex justify-content-between align-items-center mb-4 text-white">
+    <h2 class="fw-bold">Business_Systems_Op</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalBidhaa">+ Sajili Bidhaa</button>
 </div>
 
-<div class="row g-4 mb-4">
-    <div class="col-md-6">
-        <div class="card bg-dark text-white p-4 border-0 shadow">
-            <small class="text-secondary fw-bold">MAUZO YA LEO</small>
-            <h2 class="fw-bold text-primary">Tsh {{ "{:,.0f}".format(total_sales) }}</h2>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-6">
+        <div class="card bg-dark text-white p-3 border-0 shadow">
+            <small class="text-secondary fw-bold">MAUZO LEO</small>
+            <h4 class="fw-bold text-primary">Tsh {{ "{:,.0f}".format(total_sales) }}</h4>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card bg-dark text-white p-4 border-0 shadow border-start border-danger border-4">
+    <div class="col-6 col-md-6">
+        <div class="card bg-dark text-white p-3 border-0 shadow border-start border-danger border-4">
             <small class="text-secondary fw-bold">LOW STOCK</small>
-            <h2 class="text-danger fw-bold">{{ low_stock_count }}</h2>
+            <h4 class="text-danger fw-bold">{{ low_stock_count }}</h4>
         </div>
     </div>
 </div>
 
-<div class="bg-dark p-4 shadow" style="border-radius: 15px;">
-    <h5 class="mb-4 text-secondary">Bidhaa Ghalani</h5>
+<div class="bg-dark p-3" style="border-radius: 15px;">
+    <h6 class="mb-3 text-secondary">Bidhaa Ghalani</h6>
     <div class="table-responsive">
-        <table class="table table-dark table-hover">
+        <table class="table table-dark table-hover align-middle">
             <thead>
-                <tr><th>JINA</th><th>BEI (KUUZA)</th><th>STOCK</th><th>ACTION</th></tr>
+                <tr class="small text-secondary"><th>JINA</th><th>BEI</th><th>STK</th><th>Action</th></tr>
             </thead>
             <tbody>
                 {% for p in products %}
                 <tr>
                     <td class="fw-bold">{{ p.name }}</td>
-                    <td>Tsh {{ "{:,.0f}".format(p.selling_price) }}</td>
+                    <td>{{ "{:,.0f}".format(p.selling_price) }}</td>
                     <td>{{ p.stock }}</td>
-                    <td><a href="/sell/{{ p.id }}" class="btn btn-sm btn-success px-3">Uza Moja</a></td>
+                    <td><a href="/sell/{{ p.id }}" class="btn btn-sm btn-success">Uza</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -41,19 +41,31 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalBidhaa" tabindex="-1">
+<div class="modal fade" id="modalBidhaa" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-white text-dark shadow-lg">
+        <div class="modal-content bg-white text-dark">
             <div class="modal-header border-0">
                 <h5 class="modal-title fw-bold">Sajili Bidhaa Mpya</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form action="/add_product" method="POST">
                 <div class="modal-body">
-                    <input type="text" name="name" class="form-control mb-3 text-dark border-primary" placeholder="Jina la Bidhaa" required>
-                    <input type="number" name="buying_price" class="form-control mb-3 text-dark border-primary" placeholder="Bei ya Kununua" required>
-                    <input type="number" name="selling_price" class="form-control mb-3 text-dark border-primary" placeholder="Bei ya Kuuza" required>
-                    <input type="number" name="stock" class="form-control mb-3 text-dark border-primary" placeholder="Idadi" required>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Jina la Bidhaa</label>
+                        <input type="text" name="name" class="form-control border-dark text-dark bg-light" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Bei ya Kununua</label>
+                        <input type="number" name="buying_price" class="form-control border-dark text-dark bg-light" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Bei ya Kuuza</label>
+                        <input type="number" name="selling_price" class="form-control border-dark text-dark bg-light" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Idadi (Stock)</label>
+                        <input type="number" name="stock" class="form-control border-dark text-dark bg-light" required>
+                    </div>
                 </div>
                 <div class="modal-footer border-0">
                     <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Hifadhi Bidhaa</button>
