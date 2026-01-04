@@ -1,1 +1,72 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Dashboard</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">+ Sajili Bidhaa</button>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card bg-dark text-white border-0 shadow-sm p-3">
+                <small class="text-secondary">MAUZO YA LEO</small>
+                <h2 class="fw-bold">Tsh {{ "{:,.0f}".format(total_sales) }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-white border-0 shadow-sm p-3 border-start border-danger border-4">
+                <small class="text-secondary">LOW STOCK</small>
+                <h2 class="fw-bold">{{ low_stock_count }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive bg-dark p-3" style="border-radius: 15px;">
+        <table class="table table-dark table-hover">
+            <thead>
+                <tr>
+                    <th>Bidhaa</th>
+                    <th>Bei ya Kuuza</th>
+                    <th>Stock</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr>
+                    <td>{{ p.name }}</td>
+                    <td>Tsh {{ "{:,.0f}".format(p.selling_price) }}</td>
+                    <td>
+                        {% if p.stock <= 5 %}
+                        <span class="badge bg-danger">Chache: {{ p.stock }}</span>
+                        {% else %}
+                        <span class="badge bg-success">Ipo: {{ p.stock }}</span>
+                        {% endif %}
+                    </td>
+                    <td><button class="btn btn-sm btn-outline-primary">Uza</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <form action="/add_product" method="POST">
+                <div class="modal-body">
+                    <input type="text" name="name" class="form-control mb-2" placeholder="Jina la Bidhaa" required>
+                    <input type="number" name="buying_price" class="form-control mb-2" placeholder="Bei ya Kununua" required>
+                    <input type="number" name="selling_price" class="form-control mb-2" placeholder="Bei ya Kuuza" required>
+                    <input type="number" name="stock" class="form-control mb-2" placeholder="Idadi" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary w-100">Hifadhi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
