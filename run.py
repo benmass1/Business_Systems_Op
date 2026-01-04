@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -6,7 +7,7 @@ import os
 app = Flask(__name__)
 app.secret_key = 'business_systems_op_2026_key'
 
-# --- DATABASE CONNECTION (SUPABASE) ---
+# --- DATABASE CONNECTION (Kutumia siri uliyoweka Vercel) ---
 uri = os.environ.get('DATABASE_URL')
 if uri and uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
@@ -50,6 +51,7 @@ with app.app_context():
         db.session.commit()
 
 # --- ROUTES ---
+
 @app.route('/')
 def index():
     if not session.get('logged_in'): return redirect(url_for('login'))
@@ -59,31 +61,11 @@ def index():
                            total_discount=sum(s.discount for s in Sale.query.all()),
                            low_stock_count=Product.query.filter(Product.stock <= 5).count())
 
-@app.route('/inventory')
-def inventory():
-    if not session.get('logged_in'): return redirect(url_for('login'))
-    return render_template('inventory.html', products=Product.query.all())
-
-@app.route('/sales')
-def sales():
-    if session.get('role') != 'admin': return redirect(url_for('index'))
-    return render_template('sales.html', sales=Sale.query.all())
-
-@app.route('/staff')
-def staff():
-    if session.get('role') != 'admin': return redirect(url_for('index'))
-    return render_template('staff.html', users=User.query.all())
-
-@app.route('/settings')
-def settings():
-    if session.get('role') != 'admin': return redirect(url_for('index'))
-    return render_template('settings.html', shop=Settings.query.first())
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        u = request.form.get('username').lower()
-        p = request.form.get('password')
+        u = request.form.get('username').lower().strip()
+        p = request.form.get('password').strip()
         if u == 'admin' and p == '1234':
             session['logged_in'], session['role'] = True, 'admin'
             return redirect(url_for('index'))
@@ -94,11 +76,50 @@ def login():
         flash('Login Imefeli!')
     return render_template('login.html')
 
+# REKEBISHO: Hapa sasa tumeruhusu POST ili uweze ku-add muuzaji
+@app.route('/staff', methods=['GET', 'POST'])
+def staff():
+    if session.get('role') != 'admin': return redirect(url_for('index'))
+    if request.method == 'POST':
+        u = request.form.get('username').lower().strip()
+        p = request.form.get('password').strip()
+        if u and p:
+            if not User.query.filter_by(username=u).first():
+                db.session.add(User(username=u, password=p))
+                db.session.commit()
+                flash(f'Muuzaji {u} amesajiliwa!')
+            else:
+                flash('Jina la muuzaji tayari lipo!')
+    return render_template('staff.html', users=User.query.all())
+
+@app.route('/inventory')
+def inventory():
+    if not session.get('logged_in'): return redirect(url_for('login'))
+    return render_template('inventory.html', products=Product.query.all())
+
+@app.route('/add_product', methods=['POST'])
+def add_product():
+    if session.get('role') == 'admin':
+        new_p = Product(name=request.form.get('name'), 
+                        buying_price=float(request.form.get('buying_price')),
+                        selling_price=float(request.form.get('selling_price')), 
+                        stock=int(request.form.get('stock')))
+        db.session.add(new_p); db.session.commit()
+    return redirect(url_for('index'))
+
+@app.route('/sell/<int:product_id>', methods=['POST'])
+def sell_product(product_id):
+    p = Product.query.get(product_id)
+    discount = float(request.form.get('discount', 0))
+    if p and p.stock > 0:
+        db.session.add(Sale(product_name=p.name, selling_price=p.selling_price, 
+                            discount=discount, profit=(p.selling_price - p.buying_price) - discount))
+        p.stock -= 1; db.session.commit()
+    return redirect(url_for('index'))
+
 @app.route('/logout')
 def logout():
-    session.clear()
-    return redirect(url_for('login'))
+    session.clear(); return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(debug=True)
-
