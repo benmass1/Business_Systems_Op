@@ -1,1 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4 text-primary">Ripoti ya Stoo (Inventory)</h2>
+    <div class="table-responsive bg-dark p-3" style="border-radius: 15px;">
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th>Jina</th>
+                    <th>Kununua</th>
+                    <th>Kuuza</th>
+                    <th>Faida (Unit)</th>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr>
+                    <td class="fw-bold">{{ p.name }}</td>
+                    <td>Tsh {{ "{:,.0f}".format(p.buying_price) }}</td>
+                    <td>Tsh {{ "{:,.0f}".format(p.selling_price) }}</td>
+                    <td class="text-success">Tsh {{ "{:,.0f}".format(p.selling_price - p.buying_price) }}</td>
+                    <td>{{ p.stock }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
 
