@@ -6,14 +6,11 @@ import os
 app = Flask(__name__)
 app.secret_key = 'business_systems_op_2026_key'
 
-# Sehemu ya Database (Vercel Salama)
 db_path = os.path.join('/tmp', 'business.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db = SQLAlchemy(app)
 
-# Model ya Bidhaa
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -21,7 +18,6 @@ class Product(db.Model):
     selling_price = db.Column(db.Float, nullable=False)
     stock = db.Column(db.Integer, nullable=False)
 
-# Model ya Mauzo (Imeongezwa Faida)
 class Sale(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_name = db.Column(db.String(100))
@@ -37,38 +33,42 @@ def login():
     if request.method == 'POST':
         user = request.form.get('username').strip().lower()
         pwd = request.form.get('password').strip()
+        
+        # LOGIN YA ADMIN
         if user == 'admin' and pwd == '1234':
             session['logged_in'] = True
+            session['role'] = 'admin'
+            return redirect(url_for('index'))
+        
+        # LOGIN YA MUUZAJI (USER)
+        elif user == 'muuzaji' and pwd == '5678':
+            session['logged_in'] = True
+            session['role'] = 'user'
             return redirect(url_for('index'))
         else:
-            flash('Login Failed!')
+            flash('Jina au Password siyo sahihi!')
+            
     return render_template('login.html')
 
 @app.route('/')
 def index():
     if not session.get('logged_in'): return redirect(url_for('login'))
+    
     products = Product.query.all()
-    today_sales = Sale.query.filter(Sale.timestamp >= datetime.utcnow().replace(hour=0, minute=0, second=0)).all()
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0)
+    today_sales = Sale.query.filter(Sale.timestamp >= today_start).all()
+    
     total_sales_val = sum(s.selling_price for s in today_sales)
     total_profit_val = sum(s.profit for s in today_sales)
     low_stock_count = Product.query.filter(Product.stock <= 5).count()
-    return render_template('index.html', products=products, total_sales=total_sales_val, total_profit=total_profit_val, low_stock_count=low_stock_count)
-
-@app.route('/inventory')
-def inventory():
-    if not session.get('logged_in'): return redirect(url_for('login'))
-    products = Product.query.all()
-    return render_template('inventory.html', products=products)
-
-@app.route('/sales')
-def sales_report():
-    if not session.get('logged_in'): return redirect(url_for('login'))
-    all_sales = Sale.query.order_by(Sale.timestamp.desc()).all()
-    return render_template('sales.html', sales=all_sales)
+    
+    return render_template('index.html', products=products, total_sales=total_sales_val, 
+                           total_profit=total_profit_val, low_stock_count=low_stock_count, 
+                           role=session.get('role'))
 
 @app.route('/add_product', methods=['POST'])
 def add_product():
-    if not session.get('logged_in'): return redirect(url_for('login'))
+    if session.get('role') != 'admin': return "Huna ruhusa!", 403
     new_p = Product(
         name=request.form.get('name'),
         buying_price=float(request.form.get('buying_price')),
