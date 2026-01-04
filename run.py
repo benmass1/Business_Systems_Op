@@ -6,13 +6,13 @@ import os
 app = Flask(__name__)
 app.secret_key = 'business_systems_op_2026_key'
 
-# Database Setup
+# Mpangilio wa Database (Muda mrefu kidogo kwenye /tmp)
 db_path = os.path.join('/tmp', 'business.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Models
+# --- MODELS ---
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -43,30 +43,30 @@ with app.app_context():
         db.session.add(Settings(shop_name="Business Systems Op"))
         db.session.commit()
 
+# --- LOGIN LOGIC ILIYOREKEBISHWA ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         u_name = request.form.get('username').strip().lower()
         pwd = request.form.get('password').strip()
         
-        # 1. LOGIN ZA KUDUMU (Hizi hazitakataa kamwe)
-        # Admin wa kudumu
+        # 1. ADMIN WA KUDUMU (Hafutiki)
         if u_name == 'admin' and pwd == '1234':
             session['logged_in'], session['role'], session['username'] = True, 'admin', 'Admin'
             return redirect(url_for('index'))
         
-        # Muuzaji wa kudumu (Tumia hii kama Database ikizingua)
+        # 2. MUUZAJI WA KUDUMU (Hafutiki hata database ikijifuta)
         if u_name == 'muuzaji' and pwd == '5678':
-            session['logged_in'], session['role'], session['username'] = True, 'user', 'Muuzaji'
+            session['logged_in'], session['role'], session['username'] = True, 'user', 'Muuzaji Default'
             return redirect(url_for('index'))
         
-        # 2. LOGIN KUTOKA KWENYE DATABASE (Wale unaosajili)
+        # 3. WAFANYAKAZI WENGINE (Kutoka kwenye database ya muda)
         user = User.query.filter_by(username=u_name, password=pwd).first()
         if user:
             session['logged_in'], session['role'], session['username'] = True, user.role, user.username
             return redirect(url_for('index'))
         
-        flash('Jina au Password siyo sahihi! Jaribu kutumia muuzaji/5678')
+        flash('Login Imefeli! Tumia muuzaji na 5678 kama hukusajiliwa.')
     return render_template('login.html')
 
 @app.route('/')
@@ -88,14 +88,16 @@ def staff():
         u = request.form.get('username').strip().lower()
         p = request.form.get('password').strip()
         if u and p:
-            # Hakikisha mtumiaji hayupo tayari
             if not User.query.filter_by(username=u).first():
                 db.session.add(User(username=u, password=p))
                 db.session.commit()
-                flash(f'Muuzaji {u} amesajiliwa!')
-            else:
-                flash('Jina hili tayari lipo!')
+                flash(f'Muuzaji {u} amesajiliwa kwa muda!')
     return render_template('staff.html', users=User.query.all())
+
+@app.route('/inventory')
+def inventory():
+    if not session.get('logged_in'): return redirect(url_for('login'))
+    return render_template('inventory.html', products=Product.query.all())
 
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
@@ -103,17 +105,11 @@ def settings():
     shop = Settings.query.first()
     if request.method == 'POST':
         new_name = request.form.get('shop_name')
-        if new_name: 
+        if new_name:
             shop.shop_name = new_name
             db.session.commit()
         flash('Mipangilio imehifadhiwa!')
-        return redirect(url_for('settings'))
     return render_template('settings.html', shop=shop)
-
-@app.route('/inventory')
-def inventory():
-    if not session.get('logged_in'): return redirect(url_for('login'))
-    return render_template('inventory.html', products=Product.query.all())
 
 @app.route('/sales')
 def sales_report():
@@ -137,7 +133,6 @@ def delete_product(id):
 
 @app.route('/sell/<int:product_id>')
 def sell_product(product_id):
-    if not session.get('logged_in'): return redirect(url_for('login'))
     p = Product.query.get(product_id)
     if p and p.stock > 0:
         db.session.add(Sale(product_name=p.name, selling_price=p.selling_price, profit=p.selling_price - p.buying_price))
@@ -150,3 +145,4 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
