@@ -1,21 +1,21 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-white">Business_Systems_Op</h2>
+    <h2 class="fw-bold text-white">Business Systems Op</h2>
     <button class="btn btn-primary shadow" data-bs-toggle="modal" data-bs-target="#modalBidhaa">+ Sajili Bidhaa</button>
 </div>
 
 <div class="row g-4 mb-4">
-    <div class="col-md-4">
-        <div class="card bg-dark text-white p-3 border-0 shadow">
+    <div class="col-md-6">
+        <div class="card bg-dark text-white p-4 border-0 shadow">
             <small class="text-secondary fw-bold">THAMANI YA MAUZO (LEO)</small>
-            <h3 class="fw-bold text-primary">Tsh {{ "{:,.0f}".format(total_sales) }}</h3>
+            <h2 class="fw-bold text-primary">Tsh {{ "{:,.0f}".format(total_sales) }}</h2>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card bg-dark text-white p-3 border-0 shadow border-start border-danger border-4">
+    <div class="col-md-6">
+        <div class="card bg-dark text-white p-4 border-0 shadow border-start border-danger border-4">
             <small class="text-secondary fw-bold">LOW STOCK ALERT</small>
-            <h3 class="text-danger fw-bold">{{ low_stock_count }}</h3>
+            <h2 class="text-danger fw-bold">{{ low_stock_count }}</h2>
         </div>
     </div>
 </div>
@@ -35,7 +35,7 @@
                     <td>{{ p.stock }}</td>
                     <td>
                         {% if p.stock > 0 %}
-                        <a href="/sell/{{ p.id }}" class="btn btn-sm btn-success">Uza Moja</a>
+                        <a href="/sell/{{ p.id }}" class="btn btn-sm btn-success px-3">Uza Moja</a>
                         {% else %}
                         <span class="badge bg-danger">Imeisha</span>
                         {% endif %}
@@ -47,29 +47,30 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalBidhaa" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalBidhaa" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-white text-dark shadow-lg"> <div class="modal-header">
-                <h5 class="modal-title fw-bold">Sajili Bidhaa Mpya</h5>
+        <div class="modal-content bg-white text-dark shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-dark">Sajili Bidhaa Mpya</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form action="/add_product" method="POST">
-                <div class="modal-body">
+                <div class="modal-body text-dark">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Jina la Bidhaa</label>
-                        <input type="text" name="name" class="form-control border-primary" placeholder="Mfano: Nyanya" required>
+                        <input type="text" name="name" class="form-control border-primary text-dark bg-light" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Bei ya Kununua (Tsh)</label>
-                        <input type="number" name="buying_price" class="form-control border-primary" placeholder="0" required>
+                        <input type="number" name="buying_price" class="form-control border-primary text-dark bg-light" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Bei ya Kuuza (Tsh)</label>
-                        <input type="number" name="selling_price" class="form-control border-primary" placeholder="0" required>
+                        <input type="number" name="selling_price" class="form-control border-primary text-dark bg-light" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Idadi (Stock)</label>
-                        <input type="number" name="stock" class="form-control border-primary" placeholder="0" required>
+                        <input type="number" name="stock" class="form-control border-primary text-dark bg-light" required>
                     </div>
                 </div>
                 <div class="modal-footer">
