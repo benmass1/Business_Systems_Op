@@ -6,6 +6,7 @@ import os
 app = Flask(__name__)
 app.secret_key = 'business_systems_op_2026_key'
 
+# Sehemu ya Database
 db_path = os.path.join('/tmp', 'business.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -32,7 +33,6 @@ class Sale(db.Model):
     profit = db.Column(db.Float)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Mpangilio wa Duka (Hifadhi Jina la Duka)
 class Settings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     shop_name = db.Column(db.String(100), default="Business Systems Op")
@@ -48,14 +48,20 @@ def login():
     if request.method == 'POST':
         u_name = request.form.get('username').strip().lower()
         pwd = request.form.get('password').strip()
-        if u_name == 'admin' and pwd == session.get('admin_pwd', '1234'):
+        
+        # 1. Jaribu Admin wa Kudumu
+        admin_pwd = session.get('admin_pwd', '1234')
+        if u_name == 'admin' and pwd == admin_pwd:
             session['logged_in'], session['role'], session['username'] = True, 'admin', 'Admin'
             return redirect(url_for('index'))
+        
+        # 2. Jaribu Muuzaji kwenye Database
         user = User.query.filter_by(username=u_name, password=pwd).first()
         if user:
             session['logged_in'], session['role'], session['username'] = True, user.role, user.username
             return redirect(url_for('index'))
-        flash('Login Failed!')
+        
+        flash('Jina au Password siyo sahihi! Hakikisha muuzaji amesajiliwa.')
     return render_template('login.html')
 
 @app.route('/')
@@ -70,6 +76,22 @@ def index():
                            total_profit=sum(s.profit for s in today_sales), 
                            low_stock_count=Product.query.filter(Product.stock <= 5).count())
 
+@app.route('/staff', methods=['GET', 'POST'])
+def staff():
+    if session.get('role') != 'admin': return redirect(url_for('index'))
+    if request.method == 'POST':
+        u = request.form.get('username').strip().lower()
+        p = request.form.get('password').strip()
+        if u and p:
+            # Hakikisha mtumiaji hayupo tayari
+            if not User.query.filter_by(username=u).first():
+                db.session.add(User(username=u, password=p))
+                db.session.commit()
+                flash(f'Muuzaji {u} amesajiliwa!')
+            else:
+                flash('Jina hili tayari lipo!')
+    return render_template('staff.html', users=User.query.all())
+
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     if session.get('role') != 'admin': return redirect(url_for('index'))
@@ -77,10 +99,8 @@ def settings():
     if request.method == 'POST':
         new_name = request.form.get('shop_name')
         new_pwd = request.form.get('new_password')
-        if new_name:
-            shop.shop_name = new_name
-        if new_pwd:
-            session['admin_pwd'] = new_pwd # Kwa sasa tunahifadhi kwenye session
+        if new_name: shop.shop_name = new_name
+        if new_pwd: session['admin_pwd'] = new_pwd
         db.session.commit()
         flash('Mipangilio imehifadhiwa!')
         return redirect(url_for('settings'))
@@ -90,15 +110,6 @@ def settings():
 def inventory():
     if not session.get('logged_in'): return redirect(url_for('login'))
     return render_template('inventory.html', products=Product.query.all())
-
-@app.route('/staff', methods=['GET', 'POST'])
-def staff():
-    if session.get('role') != 'admin': return redirect(url_for('index'))
-    if request.method == 'POST':
-        db.session.add(User(username=request.form.get('username').lower(), password=request.form.get('password')))
-        db.session.commit()
-        flash('Muuzaji amesajiliwa!')
-    return render_template('staff.html', users=User.query.all())
 
 @app.route('/sales')
 def sales_report():
@@ -122,6 +133,7 @@ def delete_product(id):
 
 @app.route('/sell/<int:product_id>')
 def sell_product(product_id):
+    if not session.get('logged_in'): return redirect(url_for('login'))
     p = Product.query.get(product_id)
     if p and p.stock > 0:
         db.session.add(Sale(product_name=p.name, selling_price=p.selling_price, profit=p.selling_price - p.buying_price))
