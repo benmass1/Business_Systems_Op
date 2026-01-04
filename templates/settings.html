@@ -2,45 +2,44 @@
 {% block content %}
 <div class="mb-4 text-white">
     <h2 class="fw-bold">Mipangilio ya Mfumo</h2>
-    <p class="text-secondary small">Dhibiti usalama na taarifa za duka lako</p>
+    <p class="text-secondary small">Hapa unaweza kubadili jina la duka na password ya admin</p>
 </div>
 
 {% with messages = get_flashed_messages() %}
   {% if messages %}<div class="alert alert-success border-0 shadow-sm">{{ messages[0] }}</div>{% endif %}
 {% endwith %}
 
-<div class="row g-4">
-    <div class="col-md-6">
-        <div class="card bg-dark text-white p-4 border-0 shadow-sm" style="border-radius: 20px;">
-            <h5 class="mb-4 text-primary fw-bold"><i class="bi bi-shield-lock me-2"></i>Akaunti ya Admin</h5>
-            <form action="/settings" method="POST">
+<form action="/settings" method="POST">
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card bg-dark text-white p-4 border-0 shadow-sm" style="border-radius: 20px;">
+                <h5 class="mb-4 text-warning fw-bold"><i class="bi bi-shop me-2"></i>Taarifa za Duka</h5>
                 <div class="mb-3">
-                    <label class="small text-secondary">Username</label>
-                    <input type="text" class="form-control bg-dark text-white border-secondary" value="admin" disabled>
+                    <label class="small text-secondary fw-bold">Jina la Biashara (Bonyeza Kubadili)</label>
+                    <input type="text" name="shop_name" class="form-control bg-light text-dark border-primary" value="{{ shop.shop_name }}">
                 </div>
-                <div class="mb-3">
-                    <label class="small text-secondary">Password ya Sasa</label>
-                    <input type="text" class="form-control bg-dark text-white border-secondary" value="1234" disabled>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 fw-bold py-2 rounded-pill">Update Usalama</button>
-            </form>
+                <p class="text-muted small">Jina hili litaonekana juu ya Dashboard yako.</p>
+            </div>
         </div>
-    </div>
 
-    <div class="col-md-6">
-        <div class="card bg-dark text-white p-4 border-0 shadow-sm" style="border-radius: 20px;">
-            <h5 class="mb-4 text-warning fw-bold"><i class="bi bi-shop me-2"></i>Taarifa za Duka</h5>
-            <div class="mb-3">
-                <label class="small text-secondary">Jina la Biashara</label>
-                <input type="text" class="form-control bg-dark text-white border-secondary" value="Business Systems Op" disabled>
+        <div class="col-md-6">
+            <div class="card bg-dark text-white p-4 border-0 shadow-sm" style="border-radius: 20px;">
+                <h5 class="mb-4 text-primary fw-bold"><i class="bi bi-shield-lock me-2"></i>Badili Password ya Admin</h5>
+                <div class="mb-3">
+                    <label class="small text-secondary fw-bold">Password Mpya</label>
+                    <input type="password" name="new_password" class="form-control bg-light text-dark border-primary" placeholder="Weka password mpya hapa">
+                </div>
+                <div class="mb-3">
+                    <label class="small text-secondary">Username (Haitabadilika)</label>
+                    <input type="text" class="form-control bg-dark text-secondary border-0" value="admin" readonly>
+                </div>
             </div>
-            <div class="mb-3">
-                <label class="small text-secondary">Sarafu Inayotumika</label>
-                <input type="text" class="form-control bg-dark text-white border-secondary" value="Tanzanian Shilling (Tsh)" disabled>
-            </div>
-            <p class="text-muted x-small italic">Ili kubadili jina la duka, tafadhali wasiliana na fundi wako wa mfumo.</p>
+        </div>
+        
+        <div class="col-12 mt-4 text-center">
+            <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold rounded-pill shadow">Hifadhi Mipangilio Yote</button>
         </div>
     </div>
-</div>
+</form>
 {% endblock %}
 
