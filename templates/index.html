@@ -1,107 +1,93 @@
-{% extends "layout.html" %}
+here{% extends "layout.html" %}
 {% block content %}
-
-<div class="d-flex justify-content-between align-items-center mb-5">
-    <div>
-        <h1 class="fw-bold mb-0">Hali ya Duka</h1>
-        <p class="text-secondary">Karibu tena, muonekano mpya wa biashara yako.</p>
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white fw-bold"><i class="fas fa-store me-2 text-warning"></i>{{ shop.shop_name }}</h2>
+        <span class="badge bg-dark text-warning p-2 border border-warning">{{ datetime_now }}</span>
     </div>
-    {% if session.get('role') == 'admin' %}
-    <button class="btn btn-warning px-4 py-3 rounded-pill fw-bold shadow-lg" data-bs-toggle="modal" data-bs-target="#modalBidhaa">
-        <i class="bi bi-plus-circle-fill me-2"></i>SAJILI BIDHAA
-    </button>
-    {% endif %}
-</div>
 
-<div class="row g-4 mb-5">
-    <div class="col-md-4">
-        <div class="luxury-card p-4 text-center h-100">
-            <div class="bg-warning bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
-                <i class="bi bi-cash-coin fs-2 text-warning"></i>
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="luxury-card p-3 shadow-sm border-start border-warning border-4">
+                <small class="text-secondary d-block">MAUZO YA LEO</small>
+                <h3 class="text-white fw-bold">Tsh {{ "{:,.0f}".format(total_sales) }}</h3>
             </div>
-            <h6 class="text-secondary fw-bold">MAUZO LEO</h6>
-            <h2 class="fw-bold text-white">Tsh {{ "{:,.0f}".format(total_sales) }}</h2>
+        </div>
+        <div class="col-md-3">
+            <div class="luxury-card p-3 shadow-sm border-start border-success border-4">
+                <small class="text-secondary d-block">FAIDA YA LEO</small>
+                <h3 class="text-success fw-bold">Tsh {{ "{:,.0f}".format(total_profit) }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="luxury-card p-3 shadow-sm border-start border-danger border-4">
+                <small class="text-secondary d-block">PUNGUZO LILILOTOLEWA</small>
+                <h3 class="text-danger fw-bold">Tsh {{ "{:,.0f}".format(total_discount) }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="luxury-card p-3 shadow-sm border-start border-info border-4">
+                <small class="text-secondary d-block">BIDHAA ZINAZOISHA</small>
+                <h3 class="text-info fw-bold">{{ low_stock }}</h3>
+            </div>
         </div>
     </div>
-    
-    {% if session.get('role') == 'admin' %}
-    <div class="col-md-4">
-        <div class="luxury-card p-4 text-center h-100 border-top border-success border-4">
-            <div class="bg-success bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
-                <i class="bi bi-graph-up-arrow fs-2 text-success"></i>
-            </div>
-            <h6 class="text-secondary fw-bold text-uppercase">Faida Halisi</h6>
-            <h2 class="fw-bold text-success">Tsh {{ "{:,.0f}".format(total_profit) }}</h2>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="luxury-card p-4 text-center h-100 border-top border-danger border-4">
-            <div class="bg-danger bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
-                <i class="bi bi-box-arrow-down fs-2 text-danger"></i>
-            </div>
-            <h6 class="text-secondary fw-bold text-uppercase">Stock Chache</h6>
-            <h2 class="fw-bold text-danger">{{ low_stock_count }}</h2>
-        </div>
-    </div>
-    {% endif %}
-</div>
 
-<div class="luxury-card p-4 shadow">
-    <h5 class="fw-bold mb-4 px-2"><i class="bi bi-shop me-2"></i>Banda la Mauzo</h5>
-    <div class="table-responsive">
-        <table class="table table-dark table-hover align-middle border-0">
-            <thead class="small text-secondary">
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05)">
-                    <th class="py-3 px-4">BIDHAA</th>
-                    <th class="py-3">BEI YA KUUZA</th>
-                    <th class="py-3">HALI YA STOO</th>
-                    <th class="py-3 text-end">KITENDO</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for p in products %}
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.02)">
-                    <td class="py-4 px-4 fw-bold fs-5 text-warning">{{ p.name }}</td>
-                    <td class="fw-bold">Tsh {{ "{:,.0f}".format(p.selling_price) }}</td>
-                    <td>
-                        {% if p.stock <= 5 %}
-                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 rounded-pill">Chache mno: {{ p.stock }}</span>
-                        {% else %}
-                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 rounded-pill">Ipo: {{ p.stock }}</span>
-                        {% endif %}
-                    </td>
-                    <td class="text-end">
-                        <a href="/sell/{{ p.id }}" class="btn btn-warning px-4 rounded-pill fw-bold btn-sm shadow-sm">UZA</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="modal fade" id="modalBidhaa" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-white text-dark shadow-lg" style="border-radius: 30px;">
-            <div class="modal-header border-0 pt-4 px-4">
-                <h4 class="modal-title fw-bold">Sajili Bidhaa Mpya</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form action="/add_product" method="POST">
-                <div class="modal-body px-4">
-                    <input type="text" name="name" class="form-control border-dark mb-3 p-3 rounded-4" placeholder="Jina la Bidhaa" required>
-                    <input type="number" name="buying_price" class="form-control border-dark mb-3 p-3 rounded-4" placeholder="Bei ya Kununua" required>
-                    <input type="number" name="selling_price" class="form-control border-dark mb-3 p-3 rounded-4" placeholder="Bei ya Kuuza" required>
-                    <input type="number" name="stock" class="form-control border-dark mb-3 p-3 rounded-4" placeholder="Idadi (Stock)" required>
-                </div>
-                <div class="modal-footer border-0 pb-4 px-4">
-                    <button type="submit" class="btn btn-warning w-100 p-3 rounded-pill fw-bold text-dark fs-5">HIFADHI SASA</button>
-                </div>
-            </form>
+    <div class="luxury-card p-4">
+        <h4 class="text-white mb-4"><i class="fas fa-shopping-cart me-2"></i>Fanya Mauzo</h4>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle">
+                <thead>
+                    <tr class="text-secondary border-bottom border-secondary">
+                        <th>JINA LA BIDHAA</th>
+                        <th>BEI YA KUUZA</th>
+                        <th>STOO</th>
+                        <th style="width: 150px;">WEKA PUNGUZO</th>
+                        <th class="text-end">KITENDO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr>
+                        <td class="fw-bold text-warning">{{ p.name }}</td>
+                        <td class="text-white fw-semibold">{{ "{:,.0f}".format(p.selling_price) }}</td>
+                        <td>
+                            {% if p.stock <= 5 %}
+                                <span class="badge bg-danger">Inaisha: {{ p.stock }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ p.stock }}</span>
+                            {% endif %}
+                        </td>
+                        
+                        <form action="{{ url_for('sell', id=p.id) }}" method="POST">
+                            <td>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-dark border-secondary text-secondary">Tsh</span>
+                                    <input type="number" name="discount" class="form-control bg-dark text-white border-secondary" placeholder="0" min="0">
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <button type="submit" class="btn btn-warning btn-sm px-4 rounded-pill fw-bold text-dark">
+                                    <i class="fas fa-check-circle me-1"></i> UZA
+                                </button>
+                            </td>
+                        </form>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
+<style>
+    .luxury-card {
+        background: #1a1a1a;
+        border-radius: 15px;
+        border: 1px solid #333;
+    }
+    .table-dark {
+        background-color: transparent !important;
+    }
+</style>
 {% endblock %}
-
