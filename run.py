@@ -1,33 +1,24 @@
-
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
-import logging
 import os
 
-# ---------------- SETUP ----------------
 app = Flask(__name__)
-app.secret_key = 'business_systems_op_2026_master_key_v10'
+app.secret_key = 'business_systems_op_2026_master_v3'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 
 # ---------------- DATABASE CONFIG ----------------
-# Inasoma ile DATABASE_URL uliyoweka kule Vercel
+# Inasoma DATABASE_URL uliyoweka Vercel
 DATABASE_URL = os.getenv("DATABASE_URL")
-
-if DATABASE_URL:
-    if DATABASE_URL.startswith("postgres://"):
-        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-else:
-    # Ikitokea siri haijakaa sawa, itatumia hii ya muda kuzuia crash
-    DATABASE_URL = 'sqlite:///' + os.path.join('/tmp', 'pos_temp.db')
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db = SQLAlchemy(app)
 
-# ---------------- MODELS ----------------
+# ---------------- MODELS (Meza za Database) ----------------
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -53,20 +44,20 @@ class User(db.Model):
 class Settings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     shop_name = db.Column(db.String(100), default="Business Systems Op")
-    shop_slogan = db.Column(db.String(200), default="Huduma Bora")
     admin_password = db.Column(db.String(200), default=generate_password_hash("1234"))
 
-# ---------------- INITIALIZE DATABASE (HAPA NDIPO SULUHISHO LIPO) ----------------
+# ---------------- INITIALIZE DATABASE ----------------
+# Hii sehemu ndio itatengeneza meza Supabase kiotomatiki
 with app.app_context():
     try:
-        db.create_all() # Hii itatengeneza meza kule Supabase kiotomatiki
+        db.create_all() 
         if not Settings.query.first():
             db.session.add(Settings())
             db.session.commit()
     except Exception as e:
-        print(f"Database Initialization Error: {e}")
+        print(f"Database setup error: {e}")
 
-# ---------------- ROUTES ----------------
+# ---------------- ROUTES (Kurasa za Duka) ----------------
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -96,7 +87,7 @@ def index():
                                total_sales=sum(s.selling_price - s.discount for s in sales_today),
                                total_profit=sum(s.profit for s in sales_today),
                                low_stock=Product.query.filter(Product.stock <= 5).count())
-    except: return "Database Error: Hakikisha siri za Supabase zipo sahihi."
+    except: return "Kosa la Database: Hakikisha siri za Supabase zipo sahihi."
 
 @app.route('/inventory')
 def inventory():
@@ -153,3 +144,4 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
