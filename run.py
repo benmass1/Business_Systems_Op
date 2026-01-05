@@ -5,12 +5,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
-app.secret_key = 'business_systems_op_2026_master_v3'
+app.secret_key = 'business_systems_op_2026_final_v5'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 
-# ---------------- DATABASE CONFIG ----------------
-# Inasoma DATABASE_URL uliyoweka Vercel
+# ---------------- DATABASE CONFIG (SUPABASE) ----------------
+# Inasoma ile siri uliyoweka Vercel (postgresql://...)
 DATABASE_URL = os.getenv("DATABASE_URL")
+
 if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
@@ -18,7 +19,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# ---------------- MODELS (Meza za Database) ----------------
+# ---------------- MODELS (MEZA ZA DUKA) ----------------
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -46,19 +47,20 @@ class Settings(db.Model):
     shop_name = db.Column(db.String(100), default="Business Systems Op")
     admin_password = db.Column(db.String(200), default=generate_password_hash("1234"))
 
-# ---------------- INITIALIZE DATABASE ----------------
-# Hii sehemu ndio itatengeneza meza Supabase kiotomatiki
-with app.app_context():
+# ---------------- NJIA YA MKATO (INITIALIZE DB) ----------------
+# Ukiandika /init_db mwishoni mwa link yako, meza zinatengenezwa Supabase
+@app.route('/init_db')
+def init_db():
     try:
-        db.create_all() 
+        db.create_all()
         if not Settings.query.first():
             db.session.add(Settings())
             db.session.commit()
+        return "Hongera Masanja! Ghala la Supabase limetengenezwa. <a href='/login'>Bonyeza hapa Kuingia</a>"
     except Exception as e:
-        print(f"Database setup error: {e}")
+        return f"Tatizo la Database: {e}. Hakikisha DATABASE_URL kule Vercel ipo sahihi."
 
-# ---------------- ROUTES (Kurasa za Duka) ----------------
-
+# ---------------- ROUTES ----------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -87,7 +89,8 @@ def index():
                                total_sales=sum(s.selling_price - s.discount for s in sales_today),
                                total_profit=sum(s.profit for s in sales_today),
                                low_stock=Product.query.filter(Product.stock <= 5).count())
-    except: return "Kosa la Database: Hakikisha siri za Supabase zipo sahihi."
+    except:
+        return redirect(url_for('init_db'))
 
 @app.route('/inventory')
 def inventory():
@@ -130,11 +133,8 @@ def sell(id):
 def sales_report():
     if session.get('role') != 'admin': return redirect(url_for('index'))
     sales = Sale.query.order_by(Sale.timestamp.desc()).all()
-    stats = {
-        'total_sales_month': sum(s.selling_price - s.discount for s in sales),
-        'total_profit_month': sum(s.profit for s in sales),
-        'total_count': len(sales)
-    }
+    stats = {'total_sales_month': sum(s.selling_price - s.discount for s in sales),
+             'total_profit_month': sum(s.profit for s in sales), 'total_count': len(sales)}
     return render_template('sales.html', sales=sales, stats=stats)
 
 @app.route('/logout')
