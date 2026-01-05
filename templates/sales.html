@@ -1,135 +1,63 @@
 {% extends "layout.html" %}
 {% block content %}
-
 <div class="container-fluid py-4">
+    <h2 class="fw-bold text-white mb-4">Ripoti Kamili ya Mauzo</h2>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold text-white mb-1">Historia ya Mauzo & Faida</h2>
-            <p class="text-secondary small mb-0">Uchambuzi wa mapato na mwenendo wa biashara yako leo na mwezi huu</p>
-        </div>
-        <div class="d-flex gap-2 no-print">
-            <button class="btn btn-outline-light rounded-pill px-4 shadow-sm" onclick="window.print()">
-                <i class="bi bi-printer-fill me-2"></i> Print Ripoti
-            </button>
-        </div>
-    </div>
-
-    <div class="row g-3 mb-4 no-print">
+    <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="card bg-dark border-0 shadow-sm p-3 rounded-4 border-start border-primary border-4" style="border-radius: 15px;">
-                <small class="text-secondary fw-bold text-uppercase">Mauzo ya Mwezi</small>
-                <h3 class="text-white mb-0 fw-bold">Tsh {{ "{:,.0f}".format(stats.total_sales_month) }}</h3>
+            <div class="card bg-dark border-start border-primary border-4 p-3 rounded-4 shadow">
+                <small class="text-secondary">MAUZO (MWEZI)</small>
+                <h4 class="text-white fw-bold">Tsh {{ "{:,.0f}".format(stats.total_sales_month) }}</h4>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-dark border-0 shadow-sm p-3 rounded-4 border-start border-success border-4" style="border-radius: 15px;">
-                <small class="text-secondary fw-bold text-uppercase">Faida Safi (Mwezi)</small>
-                <h3 class="text-success mb-0 fw-bold">Tsh {{ "{:,.0f}".format(stats.total_profit_month) }}</h3>
+            <div class="card bg-dark border-start border-success border-4 p-3 rounded-4 shadow">
+                <small class="text-secondary">FAIDA (MWEZI)</small>
+                <h4 class="text-success fw-bold">Tsh {{ "{:,.0f}".format(stats.total_profit_month) }}</h4>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-dark border-0 shadow-sm p-3 rounded-4 border-start border-warning border-4" style="border-radius: 15px;">
-                <small class="text-secondary fw-bold text-uppercase">Mauzo ya Leo</small>
-                <h3 class="text-warning mb-0 fw-bold">Tsh {{ "{:,.0f}".format(stats.total_sales_today) }}</h3>
+            <div class="card bg-dark border-start border-warning border-4 p-3 rounded-4 shadow">
+                <small class="text-secondary">MAUZO LEO</small>
+                <h4 class="text-warning fw-bold">Tsh {{ "{:,.0f}".format(stats.total_sales_today) }}</h4>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-dark border-0 shadow-sm p-3 rounded-4 border-start border-info border-4" style="border-radius: 15px;">
-                <small class="text-secondary fw-bold text-uppercase">Transaksheni</small>
-                <h3 class="text-info mb-0 fw-bold">{{ stats.total_count }}</h3>
+            <div class="card bg-dark border-start border-info border-4 p-3 rounded-4 shadow">
+                <small class="text-secondary">IDADI YA MAUZO</small>
+                <h4 class="text-info fw-bold">{{ stats.total_count }}</h4>
             </div>
         </div>
     </div>
 
-    <div class="card bg-dark border-0 shadow-lg" style="border-radius:20px; border: 1px solid #333 !important;">
-        <div class="card-header bg-transparent border-bottom border-secondary p-4 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 text-white fw-bold">
-                <i class="bi bi-clock-history me-2 text-primary"></i>Mseto wa Mauzo Yote
-            </h5>
-            <input type="text" id="salesSearch" class="form-control bg-light border-0 w-25 no-print" 
-                   placeholder="Tafuta bidhaa au tarehe..." onkeyup="searchSales()">
-        </div>
-
+    <div class="card bg-dark border-0 shadow-lg rounded-4 overflow-hidden">
         <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle mb-0">
-                <thead class="text-secondary small text-uppercase bg-opacity-10 bg-white">
+            <table class="table table-dark table-hover mb-0">
+                <thead class="text-secondary small">
                     <tr>
-                        <th class="ps-4 py-3">Muda & Tarehe</th>
-                        <th>Jina la Bidhaa</th>
-                        <th class="text-primary">Bei Aliyouziwa</th>
-                        <th class="text-danger">Punguzo</th>
-                        <th class="text-success">Faida</th>
-                        <th class="pe-4">Muuzaji</th>
+                        <th class="ps-4">MUDA</th>
+                        <th>BIDHAA</th>
+                        <th>BEI (NET)</th>
+                        <th>FAIDA</th>
+                        <th>MUUZAJI</th>
                     </tr>
                 </thead>
-                <tbody id="salesTable">
+                <tbody>
                     {% for s in sales %}
-                    <tr class="border-bottom border-secondary border-opacity-10">
-                        <td class="ps-4">
-                            <span class="text-white fw-bold">{{ s.timestamp.strftime('%H:%M') }}</span>
-                            <small class="text-secondary d-block" style="font-size: 0.75rem;">{{ s.timestamp.strftime('%Y-%m-%d') }}</small>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-warning bg-opacity-10 p-2 rounded me-2">
-                                    <i class="bi bi-cart-check-fill text-warning"></i>
-                                </div>
-                                <span class="fw-bold text-white">{{ s.product_name }}</span>
-                            </div>
-                        </td>
-                        <td class="fw-bold">Tsh {{ "{:,.0f}".format(s.selling_price - s.discount) }}</td>
-                        <td class="text-danger">
-                            {% if s.discount > 0 %}
-                            -{{ "{:,.0f}".format(s.discount) }}
-                            {% else %}
-                            <span class="opacity-25">0</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-success fw-bold">+ Tsh {{ "{:,.0f}".format(s.profit) }}</td>
-                        <td class="pe-4">
-                            <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25 rounded-pill px-3">
-                                {{ s.seller_name or 'Admin' }}
-                            </span>
-                        </td>
+                    <tr>
+                        <td class="ps-4 small text-secondary">{{ s.timestamp.strftime('%H:%M') }}</td>
+                        <td class="fw-bold">{{ s.product_name }}</td>
+                        <td>Tsh {{ "{:,.0f}".format(s.selling_price - s.discount) }}</td>
+                        <td class="text-success fw-bold">+{{ "{:,.0f}".format(s.profit) }}</td>
+                        <td><span class="badge bg-secondary opacity-50">{{ s.seller_name or 'Admin' }}</span></td>
                     </tr>
                     {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center py-5">
-                            <i class="bi bi-journal-x fs-1 text-secondary opacity-25"></i>
-                            <p class="text-secondary mt-2">Bado hakuna rekodi za mauzo zilizopatikana.</p>
-                        </td>
-                    </tr>
+                    <tr><td colspan="5" class="text-center py-5 text-secondary">Hakuna mauzo yaliyopatikana.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-
-<script>
-function searchSales() {
-    let input = document.getElementById("salesSearch");
-    let filter = input.value.toLowerCase();
-    let rows = document.querySelectorAll("#salesTable tr");
-    rows.forEach(row => {
-        let text = row.innerText.toLowerCase();
-        row.style.display = text.includes(filter) ? "" : "none";
-    });
-}
-</script>
-
-<style>
-    @media print {
-        .no-print, .navbar, .btn, #salesSearch { display: none !important; }
-        .card { border: none !important; background: white !important; }
-        .table-dark { background: white !important; color: black !important; }
-        body { background: white !important; }
-        .text-white, .text-secondary { color: black !important; }
-        .bg-dark { background: white !important; }
-        .table-dark tr td { color: black !important; border-bottom: 1px solid #ddd !important; }
-    }
-</style>
-
 {% endblock %}
 
