@@ -1,45 +1,161 @@
 {% extends "layout.html" %}
 {% block content %}
+
 <div class="mb-4 text-white">
     <h2 class="fw-bold">Mipangilio ya Mfumo</h2>
-    <p class="text-secondary small">Hapa unaweza kubadili jina la duka na password ya admin</p>
+    <p class="text-secondary small">
+        Dhibiti taarifa za biashara, usalama wa akaunti na mfumo kwa ujumla
+    </p>
 </div>
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}<div class="alert alert-success border-0 shadow-sm">{{ messages[0] }}</div>{% endif %}
+<!-- FLASH MESSAGE -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} border-0 shadow-sm rounded-4">
+        <i class="bi bi-check-circle me-1"></i> {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
 {% endwith %}
 
-<form action="/settings" method="POST">
-    <div class="row g-4">
-        <div class="col-md-6">
-            <div class="card bg-dark text-white p-4 border-0 shadow-sm" style="border-radius: 20px;">
-                <h5 class="mb-4 text-warning fw-bold"><i class="bi bi-shop me-2"></i>Taarifa za Duka</h5>
-                <div class="mb-3">
-                    <label class="small text-secondary fw-bold">Jina la Biashara (Bonyeza Kubadili)</label>
-                    <input type="text" name="shop_name" class="form-control bg-light text-dark border-primary" value="{{ shop.shop_name }}">
-                </div>
-                <p class="text-muted small">Jina hili litaonekana juu ya Dashboard yako.</p>
-            </div>
-        </div>
+<form action="/settings" method="POST" autocomplete="off">
 
-        <div class="col-md-6">
-            <div class="card bg-dark text-white p-4 border-0 shadow-sm" style="border-radius: 20px;">
-                <h5 class="mb-4 text-primary fw-bold"><i class="bi bi-shield-lock me-2"></i>Badili Password ya Admin</h5>
+<div class="row g-4">
+
+    <!-- SHOP SETTINGS -->
+    <div class="col-lg-6">
+        <div class="card bg-dark text-white border-0 shadow-lg h-100" style="border-radius:20px">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold text-warning mb-4">
+                    <i class="bi bi-shop me-2"></i>
+                    Taarifa za Biashara
+                </h5>
+
                 <div class="mb-3">
-                    <label class="small text-secondary fw-bold">Password Mpya</label>
-                    <input type="password" name="new_password" class="form-control bg-light text-dark border-primary" placeholder="Weka password mpya hapa">
+                    <label class="small text-secondary fw-bold">
+                        Jina la Biashara
+                    </label>
+                    <input type="text"
+                           name="shop_name"
+                           class="form-control bg-light text-dark border-primary"
+                           value="{{ shop.shop_name }}"
+                           required>
+                    <small class="text-muted">
+                        Jina hili litaonekana kwenye Dashboard, Reports na Print.
+                    </small>
                 </div>
+
                 <div class="mb-3">
-                    <label class="small text-secondary">Username (Haitabadilika)</label>
-                    <input type="text" class="form-control bg-dark text-secondary border-0" value="admin" readonly>
+                    <label class="small text-secondary fw-bold">
+                        Kauli mbiu / Maelezo (Hiari)
+                    </label>
+                    <input type="text"
+                           name="shop_slogan"
+                           class="form-control bg-light text-dark"
+                           placeholder="Mf: Huduma Bora Kila Wakati"
+                           value="{{ shop.shop_slogan if shop.shop_slogan else '' }}">
                 </div>
+
             </div>
-        </div>
-        
-        <div class="col-12 mt-4 text-center">
-            <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold rounded-pill shadow">Hifadhi Mipangilio Yote</button>
         </div>
     </div>
-</form>
-{% endblock %}
 
+    <!-- SECURITY SETTINGS -->
+    <div class="col-lg-6">
+        <div class="card bg-dark text-white border-0 shadow-lg h-100" style="border-radius:20px">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold text-primary mb-4">
+                    <i class="bi bi-shield-lock me-2"></i>
+                    Usalama wa Admin
+                </h5>
+
+                <div class="mb-3">
+                    <label class="small text-secondary fw-bold">
+                        Password ya Sasa
+                    </label>
+                    <input type="password"
+                           name="current_password"
+                           class="form-control bg-light text-dark"
+                           placeholder="Weka password ya sasa"
+                           required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="small text-secondary fw-bold">
+                        Password Mpya
+                    </label>
+                    <input type="password"
+                           name="new_password"
+                           class="form-control bg-light text-dark"
+                           placeholder="Password mpya (angalau herufi 6)">
+                </div>
+
+                <div class="mb-3">
+                    <label class="small text-secondary fw-bold">
+                        Thibitisha Password Mpya
+                    </label>
+                    <input type="password"
+                           name="confirm_password"
+                           class="form-control bg-light text-dark"
+                           placeholder="Rudia password mpya">
+                </div>
+
+                <div class="mb-3">
+                    <label class="small text-secondary">
+                        Username (haiwezi kubadilishwa)
+                    </label>
+                    <input type="text"
+                           class="form-control bg-secondary bg-opacity-10 text-secondary border-0"
+                           value="admin"
+                           readonly>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SYSTEM INFO -->
+    <div class="col-12">
+        <div class="card bg-dark border-0 shadow-sm" style="border-radius:20px">
+            <div class="card-body p-3 text-center text-secondary small">
+                <i class="bi bi-info-circle me-1"></i>
+                Mabadiliko ya password yatahitaji login upya kwa usalama wa mfumo
+            </div>
+        </div>
+    </div>
+
+    <!-- SAVE BUTTON -->
+    <div class="col-12 text-center mt-4">
+        <button type="submit"
+                class="btn btn-primary btn-lg px-5 rounded-pill fw-bold shadow">
+            <i class="bi bi-save me-1"></i>
+            Hifadhi Mipangilio
+        </button>
+    </div>
+
+</div>
+</form>
+
+<!-- OPTIONAL CLIENT VALIDATION -->
+<script>
+document.querySelector("form").addEventListener("submit", function(e){
+    const newPass = document.querySelector("[name='new_password']").value;
+    const confirmPass = document.querySelector("[name='confirm_password']").value;
+
+    if(newPass || confirmPass){
+        if(newPass.length < 6){
+            alert("Password mpya lazima iwe na herufi angalau 6");
+            e.preventDefault();
+        }
+        if(newPass !== confirmPass){
+            alert("Password mpya hazifanani");
+            e.preventDefault();
+        }
+    }
+});
+</script>
+
+{% endblock %}
