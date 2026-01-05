@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
@@ -5,13 +6,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
-app.secret_key = 'business_systems_op_2026_final_v5'
+app.secret_key = 'business_systems_op_2026_quantity_v6'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 
 # ---------------- DATABASE CONFIG (SUPABASE) ----------------
-# Inasoma ile siri uliyoweka Vercel (postgresql://...)
 DATABASE_URL = os.getenv("DATABASE_URL")
-
 if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
@@ -19,7 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# ---------------- MODELS (MEZA ZA DUKA) ----------------
+# ---------------- MODELS (MABORESHO YA IDADI) ----------------
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -30,7 +29,8 @@ class Product(db.Model):
 class Sale(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_name = db.Column(db.String(100))
-    selling_price = db.Column(db.Float)
+    quantity = db.Column(db.Integer, default=1) # Sehemu mpya ya idadi
+    total_price = db.Column(db.Float)
     discount = db.Column(db.Float, default=0.0)
     profit = db.Column(db.Float)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
@@ -48,7 +48,6 @@ class Settings(db.Model):
     admin_password = db.Column(db.String(200), default=generate_password_hash("1234"))
 
 # ---------------- NJIA YA MKATO (INITIALIZE DB) ----------------
-# Ukiandika /init_db mwishoni mwa link yako, meza zinatengenezwa Supabase
 @app.route('/init_db')
 def init_db():
     try:
@@ -56,9 +55,9 @@ def init_db():
         if not Settings.query.first():
             db.session.add(Settings())
             db.session.commit()
-        return "Hongera Masanja! Ghala la Supabase limetengenezwa. <a href='/login'>Bonyeza hapa Kuingia</a>"
+        return "Hongera Masanja! Mfumo umesasishwa na sehemu ya Idadi. <a href='/login'>Ingia hapa</a>"
     except Exception as e:
-        return f"Tatizo la Database: {e}. Hakikisha DATABASE_URL kule Vercel ipo sahihi."
+        return f"Tatizo: {e}"
 
 # ---------------- ROUTES ----------------
 @app.route('/login', methods=['GET', 'POST'])
@@ -86,12 +85,44 @@ def index():
         today = datetime.utcnow().date()
         sales_today = Sale.query.filter(db.func.date(Sale.timestamp) == today).all()
         return render_template('index.html', shop=shop, products=products, 
-                               total_sales=sum(s.selling_price - s.discount for s in sales_today),
+                               total_sales=sum(s.total_price - s.discount for s in sales_today),
                                total_profit=sum(s.profit for s in sales_today),
                                low_stock=Product.query.filter(Product.stock <= 5).count())
-    except:
-        return redirect(url_for('init_db'))
+    except: return redirect(url_for('init_db'))
 
+@app.route('/sell/<int:id>', methods=['POST'])
+def sell(id):
+    if not session.get('logged_in'): return redirect(url_for('login'))
+    p = Product.query.get_or_404(id)
+    try:
+        qty = int(request.form.get('quantity') or 1) # Inapokea idadi kutoka kwa mtumiaji
+        disc = float(request.form.get('discount') or 0)
+        
+        if p.stock >= qty:
+            total_selling = p.selling_price * qty
+            total_buying = p.buying_price * qty
+            profit = (total_selling - total_buying) - disc
+            
+            new_sale = Sale(
+                product_name=p.name, 
+                quantity=qty,
+                total_price=total_selling, 
+                discount=disc, 
+                profit=max(profit, 0), 
+                seller_name=session.get('username')
+            )
+            db.session.add(new_sale)
+            p.stock -= qty # Inapunguza idadi kamili iliyouzwa
+            db.session.commit()
+            flash(f'Umeuza {p.name} (Idadi: {qty})!', 'success')
+        else:
+            flash(f'Mzigo hautoshi! Una sabuni {p.stock} tu zilizobaki.', 'warning')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Kosa: {str(e)}', 'danger')
+    return redirect(url_for('index'))
+
+# --- Zingatia: Nimeacha routes nyingine kama (inventory, sales) vilevile ---
 @app.route('/inventory')
 def inventory():
     if not session.get('logged_in'): return redirect(url_for('login'))
@@ -112,28 +143,11 @@ def add_product():
     except: db.session.rollback()
     return redirect(url_for('inventory'))
 
-@app.route('/sell/<int:id>', methods=['POST'])
-def sell(id):
-    if not session.get('logged_in'): return redirect(url_for('login'))
-    p = Product.query.get_or_404(id)
-    try:
-        disc = float(request.form.get('discount') or 0)
-        if p.stock > 0:
-            profit = (p.selling_price - p.buying_price) - disc
-            db.session.add(Sale(product_name=p.name, selling_price=p.selling_price, 
-                                discount=disc, profit=max(profit, 0), seller_name=session.get('username')))
-            p.stock -= 1
-            db.session.commit()
-            flash(f'Umeuza {p.name}!', 'success')
-        else: flash('Bidhaa imeisha!', 'warning')
-    except: db.session.rollback()
-    return redirect(url_for('index'))
-
 @app.route('/sales')
 def sales_report():
     if session.get('role') != 'admin': return redirect(url_for('index'))
     sales = Sale.query.order_by(Sale.timestamp.desc()).all()
-    stats = {'total_sales_month': sum(s.selling_price - s.discount for s in sales),
+    stats = {'total_sales_month': sum(s.total_price - s.discount for s in sales),
              'total_profit_month': sum(s.profit for s in sales), 'total_count': len(sales)}
     return render_template('sales.html', sales=sales, stats=stats)
 
