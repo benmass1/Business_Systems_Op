@@ -1,12 +1,10 @@
-
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 import os
 
-# --- MAANDALIZI YA MFUMO ---
 app = Flask(__name__)
-app.secret_key = 'business_systems_op_2026_super_ultra_key'
+app.secret_key = 'business_systems_op_2026_final_ultra_secure'
 
 # --- DATABASE CONNECTION (SUPABASE) ---
 DB_USER = os.getenv("user")
@@ -18,7 +16,7 @@ DB_NAME = os.getenv("dbname")
 if all([DB_USER, DB_PASS, DB_HOST, DB_NAME]):
     DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}?sslmode=require"
 else:
-    DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join('/tmp', 'pos_v3.db'))
+    DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join('/tmp', 'pos_final.db'))
 
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
@@ -28,7 +26,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 db = SQLAlchemy(app)
 
-# --- MODELS (MEZA ZA DATA) ---
+# --- MODELS ---
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -43,7 +41,6 @@ class Sale(db.Model):
     discount = db.Column(db.Float, default=0.0)
     profit = db.Column(db.Float)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    seller = db.Column(db.String(50))
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -63,7 +60,7 @@ with app.app_context():
             db.session.add(Settings())
             db.session.commit()
     except Exception as e:
-        print(f"DB Error: {e}")
+        print(f"Database Error: {e}")
 
 # --- ROUTES ---
 
@@ -90,57 +87,41 @@ def index():
     products = Product.query.order_by(Product.name).all()
     today = datetime.utcnow().date()
     sales = Sale.query.filter(db.func.date(Sale.timestamp) == today).all()
-    
-    t_sales = sum(s.selling_price - s.discount for s in sales)
-    t_profit = sum(s.profit for s in sales)
-    t_discount = sum(s.discount for s in sales)
-    
     return render_template('index.html', products=products, shop=shop, 
-                           total_sales=t_sales, total_profit=t_profit, 
-                           total_discount=t_discount,
+                           total_sales=sum(s.selling_price - s.discount for s in sales), 
+                           total_profit=sum(s.profit for s in sales), 
+                           total_discount=sum(s.discount for s in sales),
                            low_stock=Product.query.filter(Product.stock <= 5).count())
 
-# REKEBISHO LA KUONGEZA BIDHAA (ADD PRODUCT)
+# REKEBISHO LA KUONGEZA BIDHAA (HAPA NDIPO KAZI IPO)
 @app.route('/add_product', methods=['POST'])
 def add_product():
     if session.get('role') != 'admin': return redirect(url_for('index'))
     try:
-        name = request.form.get('name')
+        # Tunachukua data kutoka kwenye fomu
+        name = request.form.get('product_name') # Hakikisha jina linafanana na HTML
         b_price = float(request.form.get('buying_price'))
         s_price = float(request.form.get('selling_price'))
-        stock = int(request.form.get('stock'))
+        stock = int(request.form.get('stock_quantity'))
         
-        db.session.add(Product(name=name, buying_price=b_price, selling_price=s_price, stock=stock))
-        db.session.commit()
-        flash(f'Bidhaa {name} imeongezwa!', 'success')
+        if name and b_price and s_price:
+            new_item = Product(name=name, buying_price=b_price, selling_price=s_price, stock=stock)
+            db.session.add(new_item)
+            db.session.commit()
+            flash(f'Hongera! {name} imewekwa stoo.', 'success')
+        else:
+            flash('Tafadhali jaza nafasi zote!', 'warning')
     except Exception as e:
         db.session.rollback()
-        flash('Kosa! Hakikisha umejaza namba sahihi.', 'danger')
+        flash(f'Kosa: Hakikisha umeandika namba sahihi. ({str(e)})', 'danger')
+    
     return redirect(url_for('inventory'))
-
-@app.route('/sell/<int:id>', methods=['POST'])
-def sell(id):
-    if not session.get('logged_in'): return redirect(url_for('login'))
-    p = Product.query.get_or_404(id)
-    try:
-        disc = float(request.form.get('discount') or 0)
-        if p.stock > 0:
-            profit = (p.selling_price - p.buying_price) - disc
-            db.session.add(Sale(product_name=p.name, selling_price=p.selling_price, 
-                                discount=disc, profit=profit, seller=session.get('username')))
-            p.stock -= 1
-            db.session.commit()
-            flash(f'Umeuza {p.name}!', 'success')
-        else: flash('Bidhaa imeisha!', 'warning')
-    except: flash('Kosa la mauzo!', 'danger')
-    return redirect(url_for('index'))
 
 @app.route('/inventory')
 def inventory():
     if not session.get('logged_in'): return redirect(url_for('login'))
-    return render_template('inventory.html', products=Product.query.all())
+    return render_template('inventory.html', products=Product.query.order_by(Product.id.desc()).all())
 
-# REKEBISHO LA MIPANGILIO (SETTINGS)
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     if session.get('role') != 'admin': return redirect(url_for('index'))
@@ -154,16 +135,22 @@ def settings():
         return redirect(url_for('settings'))
     return render_template('settings.html', shop=shop)
 
-@app.route('/staff', methods=['GET', 'POST'])
-def staff():
-    if session.get('role') != 'admin': return redirect(url_for('index'))
-    if request.method == 'POST':
-        u = request.form.get('username', '').lower().strip()
-        p = request.form.get('password')
-        if u and p and not User.query.filter_by(username=u).first():
-            db.session.add(User(username=u, password=p)); db.session.commit()
-            flash('Muuzaji ameongezwa!', 'success')
-    return render_template('staff.html', users=User.query.all())
+@app.route('/sell/<int:id>', methods=['POST'])
+def sell(id):
+    if not session.get('logged_in'): return redirect(url_for('login'))
+    p = Product.query.get_or_404(id)
+    try:
+        disc = float(request.form.get('discount') or 0)
+        if p.stock > 0:
+            profit = (p.selling_price - p.buying_price) - disc
+            db.session.add(Sale(product_name=p.name, selling_price=p.selling_price, 
+                                discount=disc, profit=profit))
+            p.stock -= 1
+            db.session.commit()
+            flash(f'Umeuza {p.name}!', 'success')
+        else: flash('Bidhaa imeisha!', 'warning')
+    except: flash('Kosa la mauzo!', 'danger')
+    return redirect(url_for('index'))
 
 @app.route('/logout')
 def logout():
@@ -171,3 +158,4 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
