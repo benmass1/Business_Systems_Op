@@ -1,153 +1,193 @@
 {% extends "layout.html" %}
 {% block content %}
+
 <div class="container-fluid p-0">
+
+    <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-4 text-white">
         <div>
             <h2 class="fw-bold mb-1">Ripoti ya Stoo (Inventory)</h2>
-            <p class="text-secondary small mb-0">Hali ya bidhaa na thamani ya mali iliyopo ghalani</p>
+            <p class="text-secondary small mb-0">
+                Hali ya bidhaa na thamani ya mali iliyopo ghalani
+            </p>
         </div>
+
         {% if session.get('role') == 'admin' %}
-        <div class="text-end">
+        <div class="d-flex gap-2">
             <span class="badge bg-primary px-3 py-2 rounded-pill">Admin View</span>
+            <button class="btn btn-success rounded-pill"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addProductModal">
+                <i class="bi bi-plus-circle"></i> Ongeza Bidhaa
+            </button>
         </div>
         {% endif %}
     </div>
 
-    <div class="card bg-dark border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+    <!-- CARD -->
+    <div class="card bg-dark border-0 shadow-lg" style="border-radius:20px">
+
+        <!-- CARD HEADER -->
         <div class="card-header bg-dark border-bottom border-secondary p-3">
             <div class="row align-items-center">
-                <div class="col">
-                    <h6 class="mb-0 text-white fw-bold"><i class="bi bi-box-seam me-2 text-primary"></i>Orodha ya Bidhaa</h6>
+                <div class="col-md-6">
+                    <h6 class="mb-0 text-white fw-bold">
+                        <i class="bi bi-box-seam me-2 text-primary"></i>
+                        Orodha ya Bidhaa
+                    </h6>
                 </div>
-                <div class="col text-end">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
-                        <i class="bi bi-printer me-1"></i> Print
+
+                <div class="col-md-6 text-end">
+                    <input type="text"
+                           class="form-control form-control-sm w-50 d-inline"
+                           placeholder="🔍 Tafuta bidhaa..."
+                           onkeyup="filterTable(this.value)">
+                    <button class="btn btn-sm btn-outline-secondary ms-2"
+                            onclick="window.print()">
+                        <i class="bi bi-printer"></i> Print
                     </button>
                 </div>
             </div>
         </div>
-        
+
+        <!-- TABLE -->
         <div class="table-responsive">
             <table class="table table-dark table-hover align-middle mb-0">
                 <thead class="text-secondary small text-uppercase">
                     <tr>
-                        <th class="px-4 py-3 border-0">Bidhaa</th>
+                        <th class="px-4">Bidhaa</th>
                         {% if session.get('role') == 'admin' %}
-                        <th class="border-0 text-info">Bei Kununua</th>
+                        <th class="text-info">Bei Kununua</th>
                         {% endif %}
-                        <th class="border-0 text-primary">Bei Kuuza</th>
-                        <th class="border-0">Stoo Iliyopo</th>
+                        <th class="text-primary">Bei Kuuza</th>
+                        <th>Stoo</th>
                         {% if session.get('role') == 'admin' %}
-                        <th class="border-0 text-success">Thamani ya Stock</th>
-                        <th class="border-0 text-center">Kitendo</th>
+                        <th class="text-success">Thamani</th>
+                        <th class="text-center">Kitendo</th>
                         {% endif %}
                     </tr>
                 </thead>
-                <tbody class="border-top border-secondary">
-                    {% for p in products %}
-                    <tr>
-                        <td class="px-4 py-3 border-0">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary bg-opacity-10 p-2 rounded me-3 text-primary">
-                                    <i class="bi bi-tag-fill"></i>
-                                </div>
-                                <span class="fw-bold text-white fs-6">{{ p.name }}</span>
+
+                <tbody id="inventoryTable">
+                {% set total = namespace(value=0) %}
+                {% for p in products %}
+                {% set total.value = total.value + (p.buying_price * p.stock) %}
+                <tr>
+                    <td class="px-4">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
+                                <i class="bi bi-tag-fill text-primary"></i>
                             </div>
-                        </td>
-                        
-                        {% if session.get('role') == 'admin' %}
-                        <td class="border-0 text-secondary">
-                            Tsh {{ "{:,.0f}".format(p.buying_price) }}
-                        </td>
+                            <span class="fw-bold">{{ p.name }}</span>
+                        </div>
+                    </td>
+
+                    {% if session.get('role') == 'admin' %}
+                    <td class="text-secondary">
+                        Tsh {{ "{:,.0f}".format(p.buying_price) }}
+                    </td>
+                    {% endif %}
+
+                    <td class="fw-bold">
+                        Tsh {{ "{:,.0f}".format(p.selling_price) }}
+                    </td>
+
+                    <td>
+                        {% if p.stock <= 5 %}
+                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill px-3">
+                            {{ p.stock }} Low
+                        </span>
+                        {% else %}
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3">
+                            {{ p.stock }} In Stock
+                        </span>
                         {% endif %}
-                        
-                        <td class="border-0 fw-bold">
-                            Tsh {{ "{:,.0f}".format(p.selling_price) }}
-                        </td>
-                        
-                        <td class="border-0">
-                            {% if p.stock <= 5 %}
-                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 rounded-pill">
-                                <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ p.stock }} Low
-                            </span>
-                            {% else %}
-                            <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 rounded-pill">
-                                {{ p.stock }} In Stock
-                            </span>
-                            {% endif %}
-                        </td>
-                        
-                        {% if session.get('role') == 'admin' %}
-                        <td class="border-0 text-success fw-bold">
-                            Tsh {{ "{:,.0f}".format(p.buying_price * p.stock) }}
-                        </td>
-                        <td class="border-0 text-center">
-                            <div class="btn-group">
-                                <button class="btn btn-sm btn-outline-primary" title="Edit">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                                <a href="/delete_product/{{ p.id }}" 
-                                   class="btn btn-sm btn-outline-danger" 
-                                   onclick="return confirm('Je, una uhakika unataka kufuta bidhaa ya {{ p.name }}?')"
-                                   title="Delete">
-                                    <i class="bi bi-trash3"></i>
-                                </a>
-                            </div>
-                        </td>
-                        {% endif %}
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center py-5 text-secondary">
-                            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
-                            Bado hakuna bidhaa yoyote ghalani.
-                        </td>
-                    </tr>
-                    {% endfor %}
+                    </td>
+
+                    {% if session.get('role') == 'admin' %}
+                    <td class="fw-bold text-success">
+                        Tsh {{ "{:,.0f}".format(p.buying_price * p.stock) }}
+                    </td>
+                    <td class="text-center">
+                        <a href="/delete_product/{{ p.id }}"
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('Futa {{ p.name }} ?')">
+                            <i class="bi bi-trash3"></i>
+                        </a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-secondary py-5">
+                        <i class="bi bi-inbox fs-1"></i><br>
+                        Hakuna bidhaa ghalani
+                    </td>
+                </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>
-        
+
+        <!-- FOOTER SUMMARY -->
         {% if session.get('role') == 'admin' %}
-        <div class="card-footer bg-dark border-top border-secondary p-3">
+        <div class="card-footer bg-dark border-top border-secondary">
             <div class="row text-center">
-                <div class="col-md-4">
-                    <small class="text-secondary d-block">IDADI YA BIDHAA</small>
-                    <span class="fw-bold text-white">{{ products|length }}</span>
+                <div class="col">
+                    <small class="text-secondary">IDADI YA BIDHAA</small><br>
+                    <b>{{ products|length }}</b>
                 </div>
-                <div class="col-md-4">
-                    <small class="text-secondary d-block">MALI YOTE GHALANI</small>
-                    <span class="fw-bold text-success">
-                        Tsh {{ "{:,.0f}".format(products|sum(attribute='buying_price') * products|sum(attribute='stock') if products else 0) }}
-                    </span>
+                <div class="col">
+                    <small class="text-secondary">MALI YOTE</small><br>
+                    <b class="text-success">
+                        Tsh {{ "{:,.0f}".format(total.value) }}
+                    </b>
                 </div>
-                <div class="col-md-4">
-                    <small class="text-secondary d-block">BIDHAA ZILIZOISHA</small>
-                    <span class="fw-bold text-danger">
-                        {% set count = [] %}
-                        {% for p in products %}{% if p.stock <= 5 %}{% set _ = count.append(1) %}{% endif %}{% endfor %}
-                        {{ count|length }}
-                    </span>
+                <div class="col">
+                    <small class="text-secondary">ZILIZOISHA</small><br>
+                    <b class="text-danger">
+                        {{ products|selectattr('stock','le',5)|list|length }}
+                    </b>
                 </div>
             </div>
         </div>
         {% endif %}
+
     </div>
 </div>
 
-<style>
-    /* Custom Scrollbar for the table */
-    .table-responsive::-webkit-scrollbar { height: 8px; }
-    .table-responsive::-webkit-scrollbar-track { background: #1e293b; }
-    .table-responsive::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
-    
-    @media print {
-        .sidebar, .btn, .role-badge { display: none !important; }
-        .main-content { margin-left: 0 !important; width: 100% !important; }
-        .card { border: 1px solid #ccc !important; }
-        body { background-color: white !important; color: black !important; }
-        .table { color: black !important; }
-    }
-</style>
-{% endblock %}
+<!-- ADD PRODUCT MODAL -->
+{% if session.get('role') == 'admin' %}
+<div class="modal fade" id="addProductModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <form method="POST" action="/add_product" class="modal-content bg-dark text-white">
+      <div class="modal-header border-secondary">
+        <h5><i class="bi bi-plus-circle text-success"></i> Ongeza Bidhaa</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input name="name" class="form-control mb-2" placeholder="Jina la bidhaa" required>
+        <input name="buying_price" type="number" class="form-control mb-2" placeholder="Bei kununua" required>
+        <input name="selling_price" type="number" class="form-control mb-2" placeholder="Bei kuuza" required>
+        <input name="stock" type="number" class="form-control" placeholder="Idadi ya stoo" required>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button class="btn btn-success w-100">Hifadhi</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
 
+<!-- JS SEARCH -->
+<script>
+function filterTable(value){
+  value = value.toLowerCase();
+  document.querySelectorAll("#inventoryTable tr").forEach(row=>{
+    row.style.display = row.innerText.toLowerCase().includes(value)
+      ? "" : "none";
+  });
+}
+</script>
+
+{% endblock %}
