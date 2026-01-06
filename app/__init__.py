@@ -7,6 +7,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -14,25 +15,32 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
 
-    # ======================
-    # USER LOADER (MUHIMU SANA)
-    # ======================
+    # =====================
+    # USER LOADER
+    # =====================
     from app.models import User
 
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # ======================
-    # BLUEPRINTS
-    # ======================
+    # =====================
+    # CREATE TABLES (MUHIMU SANA)
+    # =====================
+    with app.app_context():
+        db.create_all()
+
+    # =====================
+    # REGISTER BLUEPRINTS
+    # =====================
     from app.auth.routes import auth
     app.register_blueprint(auth)
 
-    from app.sales.routes import sales
+    from app.sales import sales
     app.register_blueprint(sales)
 
     return app
 
-# 🔑 HII NI LAZIMA KWA GUNICORN
+
+# GUNICORN ENTRY POINT
 app = create_app()
