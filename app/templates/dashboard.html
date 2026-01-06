@@ -1,32 +1,96 @@
 {% extends "base.html" %}
-{% block title %}Dashboard{% endblock %}
+
+{% block title %}Dashboard - Orodha ya Bidhaa{% endblock %}
 
 {% block content %}
-<div class="text-center">
-    <h2 class="mb-3">📊 Dashboard</h2>
-    <p>Karibu kwenye mfumo wa uendeshaji wa biashara</p>
-
-    <div class="row mt-4">
+<div class="container-fluid">
+    <div class="row mb-4">
         <div class="col-md-4">
-            <div class="card p-3">
-                <h5>🛒 Mauzo</h5>
-                <p>0</p>
+            <div class="card bg-primary text-white shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="text-uppercase small">Jumla ya Bidhaa</h6>
+                    <h2 class="mb-0">{{ products|length }}</h2>
+                </div>
             </div>
         </div>
-
         <div class="col-md-4">
-            <div class="card p-3">
-                <h5>📦 Bidhaa</h5>
-                <p>0</p>
+            <div class="card bg-success text-white shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="text-uppercase small">Thamani ya Stock (Kuuza)</h6>
+                    {% set total_value = products|sum(attribute='selling_price') %}
+                    <h2 class="mb-0">Tsh {{ "{:,.0f}".format(total_value) }}</h2>
+                </div>
             </div>
         </div>
-
         <div class="col-md-4">
-            <div class="card p-3">
-                <h5>👤 Watumiaji</h5>
-                <p>1</p>
+            <div class="card bg-warning text-dark shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="text-uppercase small">Stock Inayoisha</h6>
+                    <h2 class="mb-0 text-danger">
+                        {{ products|selectattr('stock', 'lt', 10)|list|count }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-primary fw-bold"><i class="fas fa-boxes me-2"></i> Orodha ya Bidhaa</h5>
+            <a href="{{ url_for('main.add_product') }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i> Ongeza Mpya
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Bidhaa</th>
+                            <th class="text-center">Stock</th>
+                            <th>Bei ya Kununua</th>
+                            <th>Bei ya Kuuza</th>
+                            <th>Faida/Pcs</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in products %}
+                        <tr>
+                            <td class="fw-bold text-dark">{{ p.name }}</td>
+                            <td class="text-center">
+                                {% if p.stock <= 5 %}
+                                    <span class="badge bg-danger">Imeisha: {{ p.stock }}</span>
+                                {% elif p.stock <= 20 %}
+                                    <span class="badge bg-warning text-dark">Pungufu: {{ p.stock }}</span>
+                                {% else %}
+                                    <span class="badge bg-success">Ipo: {{ p.stock }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted">Tsh {{ "{:,.0f}".format(p.buying_price) }}</td>
+                            <td class="fw-bold">Tsh {{ "{:,.0f}".format(p.selling_price) }}</td>
+                            <td class="text-success">
+                                <i class="fas fa-arrow-up small"></i> Tsh {{ "{:,.0f}".format(p.selling_price - p.buying_price) }}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                Hakuna bidhaa iliyopatikana. <a href="{{ url_for('main.add_product') }}">Ongeza bidhaa ya kwanza</a>.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
+
