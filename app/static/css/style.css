@@ -1,39 +1,90 @@
+/* 1. Misingi ya Muonekano */
+:root {
+    --primary-color: #2563eb;
+    --dark-navy: #1f2937;
+    --bg-light: #f8fafc;
+}
+
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f4f6f8;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-light);
+    color: #334155;
 }
 
+/* 2. Rembesha Navbar */
 .navbar {
-    background: #0f5b3e;
-    color: white;
-    padding: 15px;
+    background: var(--dark-navy) !important;
+    padding: 1rem 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.container {
-    padding: 30px;
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.5px;
 }
 
+/* 3. Maboresho ya Card (Kadi) */
 .card {
-    background: white;
-    max-width: 350px;
-    margin: 60px auto;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    background: #2ecc71;
-    color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
+/* Kadi ya Dashboard iwe na kivuli laini */
+.shadow-sm {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+/* 4. Form Inputs */
+.form-control {
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    border: 1px solid #e2e8f0;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* 5. Maboresho ya Jedwali (Table) */
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: #f1f5f9;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    color: #64748b;
+    border: none;
+}
+
+/* 6. Ujumbe wa Alert (Custom Styling) */
+.alert {
+    border: none;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+/* 7. Vifungo (Buttons) */
+.btn {
+    border-radius: 8px;
+    padding: 0.5rem 1.2rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-1px);
+}
+
