@@ -37,3 +37,17 @@ def create_app():
         db.create_all()
 
     return app
+from app.models import User
+
+with app.app_context():
+    db.create_all()
+
+    # CREATE ADMIN IF NOT EXISTS
+    if not User.query.filter_by(username="admin").first():
+        admin = User(
+            username="admin",
+            password="admin123",
+            is_admin=True
+        )
+        db.session.add(admin)
+        db.session.commit()
