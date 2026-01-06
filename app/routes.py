@@ -63,4 +63,10 @@ def add_product():
             flash("Kuna makosa yamejitokeza.", "danger")
 
     return render_template("add_product.html")
-
+@main.route("/create-admin")
+def create_admin():
+    from app.models import User
+    user = User(username="admin", password="admin123")
+    db.session.add(user)
+    db.session.commit()
+    return "Admin created"
