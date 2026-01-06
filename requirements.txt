@@ -1,9 +1,2 @@
-Flask
-gunicorn
-psycopg2-binary
-flask_sqlalchemy
-python-dotenv
-
-
-
-
+Flask==2.3.3
+gunicorn==21.2.0
