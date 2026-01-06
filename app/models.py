@@ -12,9 +12,10 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(50), default="admin")
+    role = db.Column(db.String(50), default="admin")  # admin / staff
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # relationship
     sales_made = db.relationship("Sale", backref="seller", lazy=True)
 
     def set_password(self, password):
@@ -25,3 +26,43 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f"<User {self.username}>"
+
+# =========================
+# PRODUCT MODEL
+# =========================
+class Product(db.Model):
+    __tablename__ = "products"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    stock = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    sales = db.relationship("Sale", backref="product", lazy=True)
+
+    def __repr__(self):
+        return f"<Product {self.name}>"
+
+# =========================
+# SALE MODEL
+# =========================
+class Sale(db.Model):
+    __tablename__ = "sales"
+
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    total_price = db.Column(db.Float, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Sale product={self.product_id} qty={self.quantity}>"
+
+# =========================
+# LOGIN MANAGER
+# =========================
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))￼Enter
