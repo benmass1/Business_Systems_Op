@@ -14,6 +14,11 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
 
+    # ⭐ FIX YA FLASK-LOGIN
+    @login_manager.user_loader
+    def load_user(user_id):
+        return None
+
     from app.auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
     
@@ -22,5 +27,4 @@ def create_app():
 
     return app
 
-# ⭐ HII NDIO FIX
 app = create_app()
