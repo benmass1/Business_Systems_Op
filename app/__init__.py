@@ -14,17 +14,25 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
 
-    # ⭐ FIX YA FLASK-LOGIN
+    # ======================
+    # USER LOADER (MUHIMU SANA)
+    # ======================
+    from app.models import User
+
     @login_manager.user_loader
     def load_user(user_id):
-        return None
+        return User.query.get(int(user_id))
 
-    from app.auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint)
-    
-    from app.sales import sales as sales_blueprint
-    app.register_blueprint(sales_blueprint)
+    # ======================
+    # BLUEPRINTS
+    # ======================
+    from app.auth.routes import auth
+    app.register_blueprint(auth)
+
+    from app.sales.routes import sales
+    app.register_blueprint(sales)
 
     return app
 
+# 🔑 HII NI LAZIMA KWA GUNICORN
 app = create_app()
