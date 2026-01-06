@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Ongeza Bidhaa - Business System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h4 class="mb-0"><i class="fas fa-cart-plus me-2"></i> Ongeza Bidhaa Mpya</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label fw-bold">Jina la Bidhaa</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               placeholder="Mf. Sukari (Kilo 1)" required autofocus>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="buying_price" class="form-label fw-bold">Bei ya Kununua</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Tsh</span>
+                                <input type="number" step="0.01" class="form-control" 
+                                       id="buying_price" name="buying_price" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="selling_price" class="form-label fw-bold">Bei ya Kuuza</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Tsh</span>
+                                <input type="number" step="0.01" class="form-control" 
+                                       id="selling_price" name="selling_price" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="stock" class="form-label fw-bold">Idadi ya Stock (Mizigo)</label>
+                        <input type="number" class="form-control" id="stock" name="stock" 
+                               placeholder="Mf. 50" required>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save me-2"></i> Hifadhi Bidhaa
+                        </button>
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+                            Ghairi (Cancel)
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+￼Enter
