@@ -1,3 +1,4 @@
+l
 from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -39,8 +40,6 @@ class Product(db.Model):
     stock = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    sales = db.relationship("Sale", backref="product", lazy=True)
-
     def __repr__(self):
         return f"<Product {self.name}>"
 
@@ -59,7 +58,7 @@ class Sale(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
-        return f"<Sale product={self.product_id} qty={self.quantity}>"
+        return f"<Sale {self.id}>"
 
 
 # =========================
