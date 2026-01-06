@@ -1,4 +1,3 @@
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -6,11 +5,9 @@ import os
 
 db = SQLAlchemy()
 login_manager = LoginManager()
-
-# MUHIMU SANA
 login_manager.login_view = "main.login"
-login_manager.login_message = "Tafadhali ingia kwanza"
 login_manager.login_message_category = "info"
+
 
 def create_app():
     app = Flask(__name__)
@@ -21,33 +18,23 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///business.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+    # init extensions
     db.init_app(app)
     login_manager.init_app(app)
 
+    # import models
     from app.models import User
 
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
+    # register routes (blueprint)
     from app.routes import main
     app.register_blueprint(main)
 
+    # create tables
     with app.app_context():
         db.create_all()
 
     return app
-from app.models import User
-
-with app.app_context():
-    db.create_all()
-
-    # CREATE ADMIN IF NOT EXISTS
-    if not User.query.filter_by(username="admin").first():
-        admin = User(
-            username="admin",
-            password="admin123",
-            is_admin=True
-        )
-        db.session.add(admin)
-        db.session.commit()
