@@ -4,12 +4,12 @@ from flask_login import LoginManager
 
 db = SQLAlchemy()
 login_manager = LoginManager()
-login_manager.login_view = "login"
+login_manager.login_view = "main.login"
 
 def create_app():
     app = Flask(__name__)
 
-    app.config["SECRET_KEY"] = "business_systems_secret"
+    app.config["SECRET_KEY"] = "business_systems_secret_key"
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///business.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
