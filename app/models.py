@@ -15,7 +15,6 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(50), default="admin")  # admin / staff
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # relationship
     sales_made = db.relationship("Sale", backref="seller", lazy=True)
 
     def set_password(self, password):
@@ -26,6 +25,7 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f"<User {self.username}>"
+
 
 # =========================
 # PRODUCT MODEL
@@ -44,6 +44,7 @@ class Product(db.Model):
     def __repr__(self):
         return f"<Product {self.name}>"
 
+
 # =========================
 # SALE MODEL
 # =========================
@@ -60,9 +61,10 @@ class Sale(db.Model):
     def __repr__(self):
         return f"<Sale product={self.product_id} qty={self.quantity}>"
 
+
 # =========================
 # LOGIN MANAGER
 # =========================
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))￼Enter
+    return User.query.get(int(user_id))
