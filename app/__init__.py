@@ -25,7 +25,7 @@ def create_app():
         return User.query.get(int(user_id))
 
     # =====================
-    # CREATE TABLES (MUHIMU SANA)
+    # CREATE TABLES
     # =====================
     with app.app_context():
         db.create_all()
@@ -33,7 +33,7 @@ def create_app():
     # =====================
     # REGISTER BLUEPRINTS
     # =====================
-    from app.auth.routes import auth
+    from app.auth import auth
     app.register_blueprint(auth)
 
     from app.sales import sales
@@ -42,5 +42,4 @@ def create_app():
     return app
 
 
-# GUNICORN ENTRY POINT
 app = create_app()
