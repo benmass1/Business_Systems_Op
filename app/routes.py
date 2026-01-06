@@ -1,44 +1,25 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect, url_for
 
 main = Blueprint("main", __name__)
 
 @main.route("/")
 def home():
-    return """
-    <html>
-    <head>
-        <title>Business Systems OP</title>
-        <style>
-            body{
-                font-family: Arial;
-                background:#0f172a;
-                color:white;
-                display:flex;
-                justify-content:center;
-                align-items:center;
-                height:100vh;
-            }
-            .box{
-                background:#111827;
-                padding:40px;
-                border-radius:12px;
-                text-align:center;
-            }
-            a{
-                display:block;
-                margin-top:15px;
-                color:#22c55e;
-                text-decoration:none;
-                font-weight:bold;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="box">
-            <h1>✅ Mfumo Umeanza Kazi</h1>
-            <p>Business Systems Operation</p>
-            <a href="/login">Nenda Login</a>
-        </div>
-    </body>
-    </html>
-    """
+    return render_template("index.html")
+
+@main.route("/login", methods=["GET","POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        # test login (temporary)
+        if username == "admin" and password == "admin123":
+            return redirect(url_for("main.dashboard"))
+        else:
+            return render_template("login.html", error="Taarifa si sahihi")
+
+    return render_template("login.html")
+
+@main.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
