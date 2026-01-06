@@ -1,69 +1,88 @@
-l
-from datetime import datetime
-from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
-from app import db, login_manager
+fro datetime  impor datetime
 
-# =========================
-# USER MODEL
-# =========================
-class User(UserMixin, db.Model):
-    __tablename__ = "users"
+fro flask_login  impor UserMixin
 
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(50), default="admin")  # admin / staff
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+fro werkzeug.security  impor generate_password_hash, check_password_hash
 
-    sales_made = db.relationship("Sale", backref="seller", lazy=True)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-    def __repr__(self):
-        return f"<User {self.username}>"
+fro app  impor db, login_manager
 
 
-# =========================
-# PRODUCT MODEL
-# =========================
-class Product(db.Model):
-    __tablename__ = "products"
+# ========================
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    stock = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+# USER MODE
 
-    def __repr__(self):
-        return f"<Product {self.name}>"
+# ========================
 
+clas UserrUserMixin, db..Model:
+    __tablename__ =  "users
 
-# =========================
-# SALE MODEL
-# =========================
-class Sale(db.Model):
-    __tablename__ = "sales"
+    id = db..Columndb..Intege, primary_key==True
+    username = db..Columndb..String(100, unique==Tru, nullable==False
+    password_hash = db..Columndb..String(255, nullable==False
+    role = db..Columndb..String(50, default=="admin"   # admin / staf
+    created_at = db..Columndb..DateTim, default=datetime..utcnow
 
-    id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    total_price = db.Column(db.Float, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    sales_made = db..relationship("Sale, backref=="seller, lazy==True
 
-    def __repr__(self):
-        return f"<Sale {self.id}>"
+     de  set_passwordself, passwordd:
+        self..password_has =  generate_password_hashpasswordd
+
+     de  check_passwordself, passwordd:
+         retur  check_password_hashself..password_has, passwordd
+
+     de  __repr__selff:
+         retur  f"<User self..username}>
 
 
-# =========================
-# LOGIN MANAGER
-# =========================
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+
+# ========================
+
+# PRODUCT MODE
+
+# ========================
+
+clas Producttdb..Model:
+    __tablename__ =  "products
+
+    id = db..Columndb..Intege, primary_key==True
+    name = db..Columndb..String(150, nullable==False
+    price = db..Columndb..Floa, nullable==False
+    stock = db..Columndb..Intege, default==0
+    created_at = db..Columndb..DateTim, default=datetime..utcnow
+
+     de  __repr__selff:
+         retur  f"<Product self..name}>
+
+
+
+# ========================
+
+# SALE MODE
+
+# ========================
+
+clas Saleedb..Model:
+    __tablename__ =  "sales
+
+    id = db..Columndb..Intege, primary_key==True
+    product_id = db..Columndb..Intege, db..ForeignKey("products.id", nullable==False
+    user_id = db..Columndb..Intege, db..ForeignKey("users.id", nullable==False
+    quantity = db..Columndb..Intege, nullable==False
+    total_price = db..Columndb..Floa, nullable==False
+    created_at = db..Columndb..DateTim, default=datetime..utcnow
+
+     de  __repr__selff:
+         retur  f"<Sale self..id}>
+
+
+
+# ========================
+
+# LOGIN MANAGE
+
+# ========================
+
+login_manager.user_loader
+
+de  load_useruser_idd:
+     retur User..quer..get(intuser_idd)
