@@ -1,12 +1,32 @@
 {% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<h3>Dashboard</h3>
+<div class="text-center">
+    <h2 class="mb-3">📊 Dashboard</h2>
+    <p>Karibu kwenye mfumo wa uendeshaji wa biashara</p>
 
-<div class="card">
-    <p>Products: {{ products|length }}</p>
-    <p>Sales Records: {{ sales|length }}</p>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5>🛒 Mauzo</h5>
+                <p>0</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5>📦 Bidhaa</h5>
+                <p>0</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5>👤 Watumiaji</h5>
+                <p>1</p>
+            </div>
+        </div>
+    </div>
 </div>
-
-<a href="{{ url_for('main.logout') }}">Logout</a>
 {% endblock %}
