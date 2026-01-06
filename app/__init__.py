@@ -1,45 +1,24 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from config import Config
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 login_manager = LoginManager()
-login_manager.login_view = 'auth.login'
-
+login_manager.login_view = "login"
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config["SECRET_KEY"] = "business_systems_secret"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///business.db"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
     login_manager.init_app(app)
 
-    # =====================
-    # USER LOADER
-    # =====================
-    from app.models import User
+    from app.routes import main
+    app.register_blueprint(main)
 
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
-
-    # =====================
-    # CREATE TABLES
-    # =====================
     with app.app_context():
         db.create_all()
 
-    # =====================
-    # REGISTER BLUEPRINTS
-    # =====================
-    from app.auth import auth
-    app.register_blueprint(auth)
-
-    from app.sales import sales
-    app.register_blueprint(sales)
-
     return app
-
-
-app = create_app()
