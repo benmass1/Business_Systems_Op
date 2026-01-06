@@ -1,4 +1,6 @@
-{% extends "layout.html" %}
+@sales.route("/", methods=["GET"])
+def home():
+    return redirect(url_for("auth.login")){% extends "layout.html" %}
 {% block content %}
 <div class="container-fluid py-4">
     <h2 class="fw-bold text-white mb-4">Ripoti Kamili ya Mauzo</h2>
