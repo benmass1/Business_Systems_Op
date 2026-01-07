@@ -1,1 +1,116 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business_Systems_Op | Fleet Management</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --cat-yellow: #FFCD00;
+            --industry-dark: #1a1a1a;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            background-color: var(--industry-dark);
+            color: white;
+            padding-top: 20px;
+            z-index: 1000;
+        }
+
+        .brand-name {
+            font-family: 'Roboto Condensed', sans-serif;
+            color: var(--cat-yellow);
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+        }
+
+        .nav-link {
+            color: #bdc3c7;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .nav-link i {
+            width: 25px;
+            margin-right: 10px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--cat-yellow);
+            color: black;
+            font-weight: 600;
+        }
+
+        /* Main Content Styling */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 15px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar shadow">
+        <div class="brand-name">
+            <i class="fas fa-hard-hat"></i> Business_Systems_Op
+        </div>
+        <nav>
+            <a href="/" class="nav-link active"><i class="fas fa-desktop"></i> Dashboard</a>
+            <a href="/operation" class="nav-link"><i class="fas fa-cogs"></i> System Operation</a>
+            <a href="/maintenance" class="nav-link"><i class="fas fa-tools"></i> Maintenance & Repair</a>
+            <a href="/troubleshooting" class="nav-link"><i class="fas fa-search-minus"></i> Troubleshooting</a>
+            <a href="/diagnosis" class="nav-link"><i class="fas fa-stethoscope"></i> Diagnosis</a>
+            <a href="/electrical" class="nav-link"><i class="fas fa-bolt text-warning"></i> Electrical System</a>
+            <a href="/training" class="nav-link"><i class="fas fa-graduation-cap"></i> Training Hub</a>
+            <hr class="mx-3 border-secondary">
+            <a href="#" class="nav-link text-danger mt-5"><i class="fas fa-sign-out-alt"></i> Toka</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top_bar rounded shadow-sm mb-4">
+            <div class="d-flex justify-content-between w-100">
+                <span class="fw-bold"><i class="fas fa-calendar-alt"></i> {{ now }}</span>
+                <span class="text-muted">Heavy Machinery Support System v1.0</span>
+            </div>
+        </div>
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 
