@@ -1,76 +1,53 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
-from flask_login import login_user, logout_user, login_required, current_user
-from app.models import User
+from flask_login import login_required, current_user
+from app.models import User, Product, Sale
 from app import db
+from datetime import datetime, timedelta
+from sqlalchemy import func
 
-# =========================
-# BLUEPRINT (LAZIMA IWE JUU)
-# =========================
 main = Blueprint("main", __name__)
 
-# =========================
-# LOGIN
-# =========================
-@main.route("/login", methods=["GET", "POST"])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for("main.dashboard"))
-
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-
-        user = User.query.filter_by(username=username).first()
-        if user and user.check_password(password):
-            login_user(user)
-            return redirect(url_for("main.dashboard"))
-        else:
-            flash("Invalid username or password", "danger")
-
-    return render_template("login.html")
-
-
-# =========================
-# LOGOUT
-# =========================
-@main.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for("main.login"))
-
-
-# =========================
-# DASHBOARD
-# =========================
 @main.route("/")
 @login_required
 def dashboard():
-    return render_template(
-        "dashboard.html",
-        sales_today=0,
-        revenue_today=0,
-        profit_today=0,
-        total_products=0,
-        low_stock=0,
-        stock_cost=0,
-        sales_month=0,
-        users_count=1,
-        sales_labels=["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-        sales_data=[0, 0, 0, 0, 0, 0, 0],
-        top_labels=["Sample"],
-        top_data=[0]
-    )
+    # 1. Dashboard Analytics & 8. Visual Reports
+    today = datetime.utcnow().date()
+    sales_today = Sale.query.filter(func.date(Sale.created_at) == today).all()
+    
+    revenue = sum(s.total_price for s in sales_today)
+    profit = sum(s.profit for s in sales_today)
+    
+    # 4. Stock Alerts
+    low_stock = Product.query.filter(Product.stock <= 5).all()
+    
+    # Data za Grafu
+    labels = [(today - timedelta(days=i)).strftime('%a') for i in range(6, -1, -1)]
+    data = [db.session.query(func.sum(Sale.total_price)).filter(func.date(Sale.created_at) == (today - timedelta(days=i))).scalar() or 0 for i in range(6, -1, -1)]
 
+    return render_template("dashboard.html", revenue=revenue, profit=profit, 
+                           low_stock=len(low_stock), total_products=Product.query.count(),
+                           labels=labels, data=data)
 
-# =========================
-# ADD PRODUCT (GET + POST)
-# =========================
-@main.route("/add-product", methods=["GET", "POST"])
+# 2. Point of Sale (POS)
+@main.route("/sell", methods=["POST"])
 @login_required
-def add_product():
-    if request.method == "POST":
-        flash("Product saved successfully (demo mode)", "success")
-        return redirect(url_for("main.dashboard"))
+def sell_product():
+    p_id = request.form.get("product_id")
+    qty = int(request.form.get("quantity"))
+    product = Product.query.get(p_id)
 
-    return render_template("add_product.html")
+    if product and product.stock >= qty:
+        total = product.selling_price * qty
+        # 6. Profit Tracking (Selling - Buying)
+        gain = (product.selling_price - product.buying_price) * qty
+        
+        new_sale = Sale(product_id=p_id, user_id=current_user.id, 
+                        quantity=qty, total_price=total, profit=gain)
+        product.stock -= qty # Punguza Stock
+        db.session.add(new_sale)
+        db.session.commit()
+        flash(f"Umeuza {product.name} kwa Tsh {total}", "success")
+    else:
+        flash("Stock haitoshi!", "danger")
+    return redirect(url_for("main.dashboard"))
+
