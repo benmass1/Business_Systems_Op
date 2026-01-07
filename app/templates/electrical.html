@@ -1,1 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold"><i class="fas fa-bolt text-warning me-2"></i>Electrical System</h2>
+            <p class="text-muted">Uchambuzi wa mifumo ya umeme, Wiring Diagrams, na sensorer za mitambo.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="btn-group shadow-sm">
+                <button class="btn btn-outline-dark active">Caterpillar</button>
+                <button class="btn btn-outline-dark">Komatsu</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0">Main Wiring Schematic - CAT D8R</h6>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-light"><i class="fas fa-search-plus"></i></button>
+                        <button class="btn btn-light"><i class="fas fa-print"></i></button>
+                        <button class="btn btn-light"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+                <div class="card-body bg-light text-center" style="min-height: 400px; display: flex; align-items: center; justify-content: center;">
+                    <div class="text-muted">
+                        <i class="fas fa-project-diagram fa-4x mb-3 opacity-25"></i>
+                        <p>Pakia mchoro wa umeme hapa (Wiring Schematic Viewer)</p>
+                    </div>
+                </div>
+            </div>
+            
+            
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h6 class="fw-bold mb-0">ECM Connector Pinouts</h6>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Pin #</th>
+                                <th>Signal Name</th>
+                                <th>Wire Color</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>J1-01</td>
+                                <td>+Battery</td>
+                                <td>RD (Red)</td>
+                                <td>Main Power Input</td>
+                            </tr>
+                            <tr>
+                                <td>J1-05</td>
+                                <td>CAN Data Link +</td>
+                                <td>YL (Yellow)</td>
+                                <td>Communication Line</td>
+                            </tr>
+                            <tr>
+                                <td>J2-12</td>
+                                <td>Engine Speed Sensor</td>
+                                <td>WH (White)</td>
+                                <td>Input Signal from Crank</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-warning text-dark fw-bold">
+                    System Component Status
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Engine Oil Pressure Sensor
+                            <span class="badge bg-success rounded-pill">Normal</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Hydraulic Temp Sensor
+                            <span class="badge bg-success rounded-pill">Normal</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Alternator Voltage
+                            <span class="badge bg-warning text-dark rounded-pill">24.2V</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Fuel Level Sensor
+                            <span class="badge bg-danger rounded-pill">Open Circuit</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm bg-dark text-white">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3"><i class="fas fa-lightbulb text-warning me-2"></i>Tip ya Umeme</h6>
+                    <p class="small opacity-75">Kabla ya kupima sensa ya CAT, hakikisha unatumia multimeter yenye impedance ya kutosha ili kuzuia kuharibu ECM.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
