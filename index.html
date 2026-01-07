@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Systems Op | Mifumo ya Biashara</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+
+        /* Navigation */
+        nav {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #3498db;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #3498db;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        /* Services Section */
+        .services {
+            padding: 80px 5%;
+            text-align: center;
+        }
+
+        .services h2 {
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .card i {
+            font-size: 2rem;
+            color: #3498db;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* Contact Section */
+        .contact {
+            background: #ecf0f1;
+            padding: 80px 5%;
+        }
+
+        .contact-container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+        }
+
+        .contact h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Footer */
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            nav ul { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Business Systems Op</div>
+        <ul>
+            <li><a href="#">Nyumbani</a></li>
+            <li><a href="#services">Huduma</a></li>
+            <li><a href="#contact">Mawasiliano</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h1>Boresha Mfumo wa Biashara Yako</h1>
+        <p>Tunasaidia biashara ndogo na za kati kujiendesha kidijitali kwa ufanisi zaidi na kupunguza gharama.</p>
+        <a href="#contact" class="btn">Anza Sasa</a>
+    </header>
+
+    <section id="services" class="services">
+        <h2>Huduma Zetu</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Automation</h3>
+                <p>Kurahisisha kazi zinazojirudia ili kuokoa muda na nguvu kazi.</p>
+            </div>
+            <div class="card">
+                <h3>Data Analysis</h3>
+                <p>Kuchanganua takwimu za biashara yako ili kufanya maamuzi sahihi.</p>
+            </div>
+            <div class="card">
+                <h3>Software Integration</h3>
+                <p>Kuunganisha mifumo mbalimbali ya biashara ifanye kazi pamoja.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="contact-container">
+            <h2>Wasiliana Nasi</h2>
+            <form>
+                <input type="text" placeholder="Jina Lako" required>
+                <input type="email" placeholder="Barua Pepe" required>
+                <textarea rows="5" placeholder="Ujumbe Wako" required></textarea>
+                <button type="submit" class="btn" style="width: 100%; border: none; cursor: pointer;">Tuma Ujumbe</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Business Systems Op. Haki zote zimehifadhiwa.</p>
+    </footer>
+
+</body>
+</html>
