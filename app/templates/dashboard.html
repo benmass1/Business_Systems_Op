@@ -1,1 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="p-4 bg-white rounded shadow-sm border-start border-4 border-warning">
+                <h2 class="fw-bold mb-1">Business_Systems_Op: Dashboard</h2>
+                <p class="text-muted mb-0">Chagua moduli ya kiufundi kuanza ukaguzi au mafunzo ya mitambo (Caterpillar & Komatsu).</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm transition-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-primary text-white me-3">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <h5 class="fw-bold mb-0">System of Operation</h5>
+                    </div>
+                    <p class="text-secondary small">Maelezo ya jinsi mifumo ya hydraulic, powertrain, na engine inavyofanya kazi kwa pamoja.</p>
+                    <a href="/operation" class="btn btn-outline-primary w-100">Fungua Moduli</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm transition-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-success text-white me-3">
+                            <i class="fas fa-wrench"></i>
+                        </div>
+                        <h5 class="fw-bold mb-0">Maintenance & Repair</h5>
+                    </div>
+                    <p class="text-secondary small">Ratiba za service (PM), miongozo ya ukarabati wa vipengele, na kadi za ukaguzi.</p>
+                    <a href="/maintenance" class="btn btn-outline-success w-100">Angalia Ratiba</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm transition-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-warning text-dark me-3">
+                            <i class="fas fa-search-location"></i>
+                        </div>
+                        <h5 class="fw-bold mb-0">Troubleshooting</h5>
+                    </div>
+                    <p class="text-secondary small">Miongozo ya hatua kwa hatua ya kutafuta chanzo cha matatizo ya kiufundi site.</p>
+                    <a href="/troubleshooting" class="btn btn-outline-warning w-100">Anza Uchambuzi</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm transition-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-danger text-white me-3">
+                            <i class="fas fa-laptop-medical"></i>
+                        </div>
+                        <h5 class="fw-bold mb-0">Machine Diagnosis</h5>
+                    </div>
+                    <p class="text-secondary small">Uchambuzi wa Error Codes, vipimo vya pressure, na data kutoka kwenye ECM/Komtrax.</p>
+                    <a href="/diagnosis" class="btn btn-outline-danger w-100">Soma Mashine</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm transition-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-dark text-warning me-3">
+                            <i class="fas fa-charging-station"></i>
+                        </div>
+                        <h5 class="fw-bold mb-0">Electrical System</h5>
+                    </div>
+                    <p class="text-secondary small">Wiring diagrams, sensa, na mifumo ya umeme kwa ajili ya CAT na Komatsu.</p>
+                    <a href="/electrical" class="btn btn-outline-dark w-100">Wiring Diagrams</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm transition-card bg-industry-gradient text-white">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-white text-dark me-3">
+                            <i class="fas fa-book-reader"></i>
+                        </div>
+                        <h5 class="fw-bold mb-0">Training Hub</h5>
+                    </div>
+                    <p class="small opacity-75">Mafunzo ya kila mfumo, video za kiufundi, na majaribio kwa ajili ya mafundi wapya.</p>
+                    <a href="/training" class="btn btn-light w-100">Ingia Darasani</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .icon-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    .transition-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .transition-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    .bg-industry-gradient {
+        background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
+    }
+</style>
+{% endblock %}
 
