@@ -1,86 +1,88 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="row g-4">
-    <div class="col-md-3">
-        <div class="card bg-primary text-white p-3">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <h6>Mauzo ya Leo</h6>
-                    <h3>Tsh {{ "{:,.0f}".format(revenue_today) }}</h3>
+<div class="container-fluid py-4">
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-gradient-primary text-white shadow-sm border-0">
+                <div class="card-body">
+                    <p class="small mb-1">Mapato ya Leo</p>
+                    <h4 class="fw-bold">Tsh {{ "{:,.0f}".format(revenue) }}</h4>
                 </div>
-                <i class="fas fa-shopping-cart stat-icon"></i>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Faida Halisi</p>
+                    <h4 class="text-success fw-bold">Tsh {{ "{:,.0f}".format(profit) }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-white border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Bidhaa Inayoisha</p>
+                    <h4 class="text-danger fw-bold">{{ low_stock }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-dark text-white border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="small mb-1">Watumiaji</p>
+                    <h4 class="fw-bold">{{ current_user.username }} ({{ current_user.role }})</h4>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card bg-success text-white p-3">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <h6>Faida ya Leo</h6>
-                    <h3>Tsh {{ "{:,.0f}".format(profit_today) }}</h3>
+    <div class="row g-4">
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white fw-bold"><i class="fas fa-cash-register me-2"></i> POS - Uza Bidhaa</div>
+                <div class="card-body">
+                    <form action="{{ url_for('main.sell_product') }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label small">Chagua Bidhaa</label>
+                            <select name="product_id" class="form-select" required>
+                                {% for p in all_products %}
+                                <option value="{{ p.id }}">{{ p.name }} (Stock: {{ p.stock }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small">Idadi</label>
+                            <input type="number" name="quantity" class="form-control" value="1" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Kamilisha Mauzo</button>
+                    </form>
                 </div>
-                <i class="fas fa-chart-line stat-icon"></i>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-3">
-        <div class="card bg-danger text-white p-3">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <h6>Low Stock</h6>
-                    <h3>{{ low_stock }}</h3>
+        <div class="col-md-7">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white fw-bold">Mwenendo wa Mauzo (Siku 7)</div>
+                <div class="card-body">
+                    <canvas id="myChart" height="200"></canvas>
                 </div>
-                <i class="fas fa-exclamation-triangle stat-icon"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card bg-warning text-dark p-3">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <h6>Thamani ya Stock</h6>
-                    <h3>Tsh {{ "{:,.0f}".format(stock_cost) }}</h3>
-                </div>
-                <i class="fas fa-box stat-icon"></i>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row mt-5">
-    <div class="col-md-8">
-        <div class="card p-4">
-            <h5>Mwenendo wa Mauzo (Siku 7)</h5>
-            <canvas id="salesChart"></canvas>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card p-4">
-            <h5>Muhtasari</h5>
-            <p>Watumiaji: {{ users_count }}</p>
-            <p>Jumla ya Bidhaa: {{ total_products }}</p>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('salesChart').getContext('2d');
+    const ctx = document.getElementById('myChart');
     new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
-            labels: {{ sales_labels|safe }},
+            labels: {{ labels|safe }},
             datasets: [{
-                label: 'Mauzo (Tsh)',
-                data: {{ sales_data|safe }},
-                borderColor: '#2c3e50',
-                fill: true,
-                backgroundColor: 'rgba(44, 62, 80, 0.1)'
+                label: 'Mauzo ya Siku',
+                data: {{ data|safe }},
+                backgroundColor: '#3b82f6',
+                borderRadius: 5
             }]
         }
     });
