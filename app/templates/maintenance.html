@@ -1,1 +1,137 @@
 
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold"><i class="fas fa-tools text-success me-2"></i>Maintenance & Repair</h2>
+            <p class="text-muted">Usimamizi wa ratiba za Service (PM), ukarabati wa vipengele, na ukaguzi wa mashine.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <button class="btn btn-success shadow-sm"><i class="fas fa-plus me-2"></i>Rekodi Service Mpya</button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="fw-bold mb-0">Ratiba ya Huduma (Service Schedule) - Fleet Status</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Machine Model</th>
+                                    <th>Current Hours</th>
+                                    <th>Next Service</th>
+                                    <th>Remaining</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="fw-bold">CAT D8R</span> (Serial: 9EM012)</td>
+                                    <td>4,750 hrs</td>
+                                    <td>5,000 hrs (PM2)</td>
+                                    <td>250 hrs</td>
+                                    <td><span class="badge bg-success">In Good Shape</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="fw-bold">Komatsu PC200</span> (Serial: K4500)</td>
+                                    <td>9,985 hrs</td>
+                                    <td>10,000 hrs (PM4)</td>
+                                    <td><span class="text-danger fw-bold">15 hrs</span></td>
+                                    <td><span class="badge bg-warning text-dark">Urgent Service</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="fw-bold">CAT 336D</span> (Serial: JER045)</td>
+                                    <td>12,400 hrs</td>
+                                    <td>12,500 hrs (PM1)</td>
+                                    <td>100 hrs</td>
+                                    <td><span class="badge bg-success">In Good Shape</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white py-3">
+                    <h6 class="fw-bold mb-0">PM Service Checklist (1000 Hours)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold border-bottom pb-2">Injini & Mifumo ya Hewa</h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="check1">
+                                <label class="form-check-label" for="check1">Badilisha Engine Oil na Filter</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="check2">
+                                <label class="form-check-label" for="check2">Kagua Air Filter (Primary & Secondary)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold border-bottom pb-2">Hydraulic & Transmission</h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="check3">
+                                <label class="form-check-label" for="check3">Pima Hydraulic Oil Level & Quality</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="check4">
+                                <label class="form-check-label" for="check4">Badilisha Fuel Water Separator Filter</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-success text-white fw-bold">
+                    Vipuri Vinavyohitajika (Service Kit)
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-box-open fa-2x text-secondary me-3"></i>
+                        <div>
+                            <p class="mb-0 small fw-bold">CAT D8R 1000hr Kit</p>
+                            <p class="mb-0 x-small text-muted">Part No: 1R-0749, 1R-1808...</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-success w-100">Agiza Kutoka Stoo</button>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white fw-bold">
+                    Undercarriage Wear (CAT/Komatsu)
+                </div>
+                <div class="card-body p-0">
+                    <div class="p-3">
+                        <p class="small mb-1">Track Link Wear: <span class="fw-bold text-danger">85%</span></p>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 85%"></div>
+                        </div>
+                        <p class="small mb-1">Idler Wear: <span class="fw-bold">40%</span></p>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 40%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info border-0 shadow-sm">
+                <h6 class="fw-bold"><i class="fas fa-info-circle me-2"></i>Kumbuka:</h6>
+                <p class="small mb-0">Kila baada ya masaa 500, hakikisha unachukua S-O-S (Scheduled Oil Sampling) kwa ajili ya uchambuzi wa kimaabara.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
