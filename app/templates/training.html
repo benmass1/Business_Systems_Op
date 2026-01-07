@@ -1,1 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold"><i class="fas fa-graduation-cap text-dark me-2"></i>Training Hub</h2>
+            <p class="text-muted">Jifunze mifumo ya uendeshaji, ufundi, na usalama wa mashine nzito.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Tafuta somo...">
+                <button class="btn btn-dark"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-12">
+            <h5 class="fw-bold border-bottom pb-2">Video za Mafunzo (Popular)</h5>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="position-relative">
+                    <img src="https://via.placeholder.com/400x225/1a1a1a/FFCD00?text=CAT+Engine+Overhaul" class="card-img-top rounded-top" alt="Engine Training">
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="fas fa-play-circle fa-4x text-white opacity-75"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <span class="badge bg-warning text-dark mb-2">Mechanical</span>
+                    <h6 class="fw-bold">CAT C15 Engine Overhaul Guide</h6>
+                    <p class="small text-muted mb-0">Hatua za kufungua na kufunga injini ya CAT C15.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="position-relative">
+                    <img src="https://via.placeholder.com/400x225/1a1a1a/0054A6?text=Komatsu+Hydraulic" class="card-img-top rounded-top" alt="Hydraulic Training">
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="fas fa-play-circle fa-4x text-white opacity-75"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <span class="badge bg-primary mb-2">Hydraulics</span>
+                    <h6 class="fw-bold">Komatsu PC200 Hydraulic Pump Tuning</h6>
+                    <p class="small text-muted mb-0">Jinsi ya kurekebisha pressure kwenye main pump.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="position-relative">
+                    <img src="https://via.placeholder.com/400x225/333/fff?text=Electrical+Testing" class="card-img-top rounded-top" alt="Electrical Training">
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="fas fa-play-circle fa-4x text-white opacity-75"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <span class="badge bg-info text-dark mb-2">Electrical</span>
+                    <h6 class="fw-bold">Using Multimeter on CAT ECM</h6>
+                    <p class="small text-muted mb-0">Mbinu za kupima signal bila kuharibu kompyuta.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h6 class="fw-bold mb-0">Miongozo ya Kupakua (Shop Manuals)</h6>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                CAT D8R Service Manual (Full)
+                            </div>
+                            <button class="btn btn-sm btn-outline-dark"><i class="fas fa-download"></i></button>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                Komatsu PC200-8 Parts Catalog
+                            </div>
+                            <button class="btn btn-sm btn-outline-dark"><i class="fas fa-download"></i></button>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                Safety Procedures for Heavy Equipment
+                            </div>
+                            <button class="btn btn-sm btn-outline-dark"><i class="fas fa-download"></i></button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm bg-dark text-white">
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-user-check fa-3x text-warning mb-3"></i>
+                    <h5 class="fw-bold">Pima Maarifa Yako</h5>
+                    <p class="small opacity-75">Fanya jaribio fupi la mifumo ya CAT D8R ili kupata cheti cha umahiri.</p>
+                    <button class="btn btn-warning w-100 fw-bold">Anza Jaribio la Leo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
