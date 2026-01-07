@@ -1,1 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold"><i class="fas fa-search-wrench text-warning me-2"></i>Troubleshooting Guide</h2>
+            <p class="text-muted">Mwongozo wa kutafuta chanzo cha hitilafu kulingana na dalili za mashine (Symptoms).</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-dark text-white fw-bold">
+                    Chagua Dalili ya Tatizo
+                </div>
+                <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action active">
+                        <i class="fas fa-smog me-2"></i> Injini Inatoa Moshi Mweusi
+                    </button>
+                    <button class="list-group-item list-group-item-action">
+                        <i class="fas fa-thermometer-high me-2"></i> Engine Overheating
+                    </button>
+                    <button class="list-group-item list-group-item-action">
+                        <i class="fas fa-oil-can me-2"></i> Low Hydraulic Pressure
+                    </button>
+                    <button class="list-group-item list-group-item-action">
+                        <i class="fas fa-battery-quarter me-2"></i> Mashine Haistarti (Starting Issue)
+                    </button>
+                    <button class="list-group-item list-group-item-action">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Mashine Haina Nguvu (Loss of Power)
+                    </button>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <h6 class="fw-bold"><i class="fas fa-question-circle me-2"></i>Hujaona dalili?</h6>
+                    <p class="small text-muted">Ingiza dalili unayoona kwenye mashine hapa chini:</p>
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-sm" placeholder="Andika hapa...">
+                        <button class="btn btn-dark btn-sm">Tafuta</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h6 class="fw-bold mb-0 text-primary">Uchambuzi: Injini Inatoa Moshi Mweusi (Black Smoke)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning border-0">
+                        <i class="fas fa-info-circle me-2"></i> <strong>Kumbuka:</strong> Moshi mweusi mara nyingi huashiria uwiano mbaya wa hewa na mafuta (Mafuta mengi au Hewa kidogo).
+                    </div>
+
+                    <div class="accordion" id="troubleAccordion">
+                        <div class="accordion-item border-0 mb-3 shadow-sm rounded">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#step1">
+                                    Hatua ya 1: Ukaguzi wa Mfumo wa Hewa (Air Intake)
+                                </button>
+                            </h2>
+                            <div id="step1" class="accordion-collapse collapse show" data-bs-parent="#troubleAccordion">
+                                <div class="accordion-body bg-light">
+                                    <p>Kagua kama Air Filter imeziba. Moshi mweusi husababishwa na ukosefu wa hewa safi kwenye chemba ya mlipuko.</p>
+                                    <ul class="small">
+                                        <li>Ondoa Air Filter na kagua hali yake.</li>
+                                        <li>Kagua Turbocharger kama inazunguka vizuri.</li>
+                                        <li>Angalia kama kuna "Boost Leaks" kwenye Aftercooler hoses.</li>
+                                    </ul>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border-0 mb-3 shadow-sm rounded">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#step2">
+                                    Hatua ya 2: Mfumo wa Mafuta (Fuel System)
+                                </button>
+                            </h2>
+                            <div id="step2" class="accordion-collapse collapse" data-bs-parent="#troubleAccordion">
+                                <div class="accordion-body bg-light">
+                                    <p>Ikiwa mfumo wa hewa uko sawa, kagua Injectors.</p>
+                                    <ul class="small">
+                                        <li>Fanya "Injector Cutout Test" kwa kutumia CAT ET/Komatsu tool.</li>
+                                        <li>Kagua kama kuna Injector inayovuja (Dripping).</li>
+                                        <li>Pima presha ya mafuta (Fuel Rail Pressure).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+
+                    <div class="mt-4 p-3 border rounded">
+                        <h6 class="fw-bold text-success"><i class="fas fa-check-circle me-2"></i>Suluhisho la Kawaida:</h6>
+                        <p class="small mb-0">Mara nyingi kusafisha Aftercooler na kubadili Air Filters huondoa moshi mweusi kwa asilimia 70 ya mashine za CAT.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
