@@ -1,52 +1,89 @@
 {% extends "base.html" %}
+
 {% block content %}
-
-<div class="row g-3">
-
-  <div class="col-6 col-md-3">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <div class="card-title">Mauzo ya Leo</div>
-        <div class="card-value">Tsh {{ sales_today }}</div>
-      </div>
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white p-3">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h6>Mauzo ya Leo</h6>
+                    <h3>Tsh {{ "{:,.0f}".format(revenue_today) }}</h3>
+                </div>
+                <i class="fas fa-shopping-cart stat-icon"></i>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="col-6 col-md-3">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <div class="card-title">Mapato ya Leo</div>
-        <div class="card-value">Tsh {{ revenue_today }}</div>
-      </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white p-3">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h6>Faida ya Leo</h6>
+                    <h3>Tsh {{ "{:,.0f}".format(profit_today) }}</h3>
+                </div>
+                <i class="fas fa-chart-line stat-icon"></i>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="col-6 col-md-3">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <div class="card-title">Faida</div>
-        <div class="card-value">Tsh {{ profit_today }}</div>
-      </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white p-3">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h6>Low Stock</h6>
+                    <h3>{{ low_stock }}</h3>
+                </div>
+                <i class="fas fa-exclamation-triangle stat-icon"></i>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="col-6 col-md-3">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <div class="card-title">Bidhaa Zote</div>
-        <div class="card-value">{{ total_products }}</div>
-      </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark p-3">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h6>Thamani ya Stock</h6>
+                    <h3>Tsh {{ "{:,.0f}".format(stock_cost) }}</h3>
+                </div>
+                <i class="fas fa-box stat-icon"></i>
+            </div>
+        </div>
     </div>
-  </div>
-
 </div>
 
-<hr>
-
-<div class="d-grid gap-2 d-md-flex">
-    <a href="{{ url_for('main.add_product') }}" class="btn btn-primary">
-        ➕ Ongeza Bidhaa
-    </a>
+<div class="row mt-5">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h5>Mwenendo wa Mauzo (Siku 7)</h5>
+            <canvas id="salesChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4">
+            <h5>Muhtasari</h5>
+            <p>Watumiaji: {{ users_count }}</p>
+            <p>Jumla ya Bidhaa: {{ total_products }}</p>
+        </div>
+    </div>
 </div>
-
 {% endblock %}
+
+{% block scripts %}
+<script>
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ sales_labels|safe }},
+            datasets: [{
+                label: 'Mauzo (Tsh)',
+                data: {{ sales_data|safe }},
+                borderColor: '#2c3e50',
+                fill: true,
+                backgroundColor: 'rgba(44, 62, 80, 0.1)'
+            }]
+        }
+    });
+</script>
+{% endblock %}
+
