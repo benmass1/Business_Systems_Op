@@ -1,123 +1,52 @@
-
+{% extends "base.html" %}
 {% block content %}
 
-<div class="container-fluid py-3">
+<div class="row g-3">
 
-  <!-- KPI CARDS -->
-  <div class="row g-3 mb-3">
-    <div class="col-6 col-md-3">
-      <div class="card kpi blue">
-        <small>Mauzo ya Leo</small>
-        <h3>Tsh {{ sales_today }}</h3>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card kpi green">
-        <small>Mapato ya Leo</small>
-        <h3>Tsh {{ revenue_today }}</h3>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card kpi purple">
-        <small>Faida ya Leo</small>
-        <h3>Tsh {{ profit_today }}</h3>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card kpi dark">
-        <small>Bidhaa Zote</small>
-        <h3>{{ total_products }}</h3>
-      </div>
-    </div>
-
-    <div class="col-6 col-md-3">
-      <div class="card kpi warning">
-        <small>Stock Chini</small>
-        <h3>{{ low_stock }}</h3>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card kpi teal">
-        <small>Gharama ya Stock</small>
-        <h3>Tsh {{ stock_cost }}</h3>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card kpi orange">
-        <small>Mauzo ya Mwezi</small>
-        <h3>Tsh {{ sales_month }}</h3>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card kpi gray">
-        <small>Watumiaji</small>
-        <h3>{{ users_count }}</h3>
+  <div class="col-6 col-md-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="card-title">Mauzo ya Leo</div>
+        <div class="card-value">Tsh {{ sales_today }}</div>
       </div>
     </div>
   </div>
 
-  <!-- GRAPHS -->
-  <div class="row g-3 mb-3">
-    <div class="col-md-8">
-      <div class="card p-3">
-        <h6>Mauzo (Siku 7)</h6>
-        <canvas id="salesChart"></canvas>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card p-3">
-        <h6>Bidhaa Zinazoongoza</h6>
-        <canvas id="topProducts"></canvas>
+  <div class="col-6 col-md-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="card-title">Mapato ya Leo</div>
+        <div class="card-value">Tsh {{ revenue_today }}</div>
       </div>
     </div>
   </div>
 
-  <!-- QUICK ACTIONS -->
-  <div class="row g-3 mb-3">
-    <div class="col-6 col-md-3">
-      <a href="/sales" class="btn btn-primary w-100">➕ Uza Bidhaa</a>
+  <div class="col-6 col-md-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="card-title">Faida</div>
+        <div class="card-value">Tsh {{ profit_today }}</div>
+      </div>
     </div>
-    <div class="col-6 col-md-3">
-      <a href="/add-product" class="btn btn-success w-100">➕ Ongeza Bidhaa</a>
-    </div>
-    <div class="col-6 col-md-3">
-      <a href="/reports" class="btn btn-warning w-100">📄 Ripoti</a>
-    </div>
-    <div class="col-6 col-md-3">
-      <a href="/settings" class="btn btn-dark w-100">⚙️ Mipangilio</a>
+  </div>
+
+  <div class="col-6 col-md-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="card-title">Bidhaa Zote</div>
+        <div class="card-value">{{ total_products }}</div>
+      </div>
     </div>
   </div>
 
 </div>
 
-<!-- CHART JS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-const ctx = document.getElementById('salesChart');
-new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: {{ sales_labels|safe }},
-    datasets: [{
-      label: 'Mauzo',
-      data: {{ sales_data|safe }},
-      borderWidth: 2
-    }]
-  }
-});
+<hr>
 
-const ctx2 = document.getElementById('topProducts');
-new Chart(ctx2, {
-  type: 'bar',
-  data: {
-    labels: {{ top_labels|safe }},
-    datasets: [{
-      label: 'Qty',
-      data: {{ top_data|safe }},
-      borderWidth: 1
-    }]
-  }
-});
-</script>
+<div class="d-grid gap-2 d-md-flex">
+    <a href="{{ url_for('main.add_product') }}" class="btn btn-primary">
+        ➕ Ongeza Bidhaa
+    </a>
+</div>
 
 {% endblock %}
